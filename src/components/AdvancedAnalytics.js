@@ -12,7 +12,7 @@ import {
   Cell
 } from 'recharts';
 import './AdvancedAnalytics.css';
-
+import api from '../api'; 
 import {
   MapContainer,
   TileLayer,
@@ -21,7 +21,6 @@ import {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const API_BASE_URL = 'http://localhost:8000';
 
 // ---------------- INLINE ICONS ----------------
 
@@ -637,8 +636,8 @@ const AdvancedAnalytics = ({ filters }) => {
     try {
       const payload = buildGeoPayload(filters);
 
-      const response = await axios.post(
-        `${API_BASE_URL}/charts/geo-heatmap`,
+      const response = await api.post(
+        `/charts/geo-heatmap`,
         payload
       );
 
@@ -668,8 +667,8 @@ const AdvancedAnalytics = ({ filters }) => {
     try {
       const payload = buildClusterPayload(filters);
 
-      const response = await axios.post(
-        `${API_BASE_URL}/charts/cluster-scatter`,
+      const response = await api.post(
+        `/charts/cluster-scatter`,
         payload
       );
 

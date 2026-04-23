@@ -5,9 +5,8 @@ import {
   BarChart, Bar, Cell
 } from 'recharts';
 import './GlobalShapExplainer.css';
+import api from '../api'; 
 
-// ---------------- CONFIGURATION ----------------
-const API_BASE_URL = "http://localhost:8000";
 
 // ---------------- INLINE ICONS ----------------
 
@@ -170,7 +169,7 @@ const GlobalShapExplainer = () => {
     setError(null);
 
     try {
-      const response = await axios.get(`${API_BASE_URL}/explainability/global`);
+      const response = await api.get(`/explainability/global`);
       if (!response.data || (!response.data.shap_summary && !response.data.shap_bar)) {
         throw new Error("Invalid response structure");
       }

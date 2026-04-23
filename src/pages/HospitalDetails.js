@@ -7,8 +7,7 @@ import {
 } from 'recharts';
 import Header from '../components/Header';
 import './HospitalDetails.css';
-
-const API_BASE_URL = "https://risk-analysis-gtczgeh0gse2f5a5.southindia-01.azurewebsites.net";
+import api from '../api'; 
 
 // ---------------- INLINE SVG ICONS ----------------
 
@@ -168,7 +167,7 @@ const HospitalDetails = () => {
       setError(null);
 
       try {
-        const response = await axios.post(`${API_BASE_URL}/explainability/individual`, {
+        const response = await api.post(`/explainability/individual`, {
           hospital_name: hospitalName
         });
         setData(response.data);
