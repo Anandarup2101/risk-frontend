@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { 
-  ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, ReferenceArea 
+import {
+  ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer
 } from 'recharts';
 import Header from '../components/Header';
 import './HospitalDetails.css';
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://risk-analysis-gtczgeh0gse2f5a5.southindia-01.azurewebsites.net";
 
 // ---------------- INLINE SVG ICONS ----------------
 
@@ -66,7 +66,7 @@ const CustomPdpTooltip = ({ active, payload }) => {
 // PDP Card Component
 const PdpCard = ({ plot }) => {
   const getStatusClass = (status) => {
-    switch(status) {
+    switch (status) {
       case 'Good': return 'status-good';
       case 'Needs Attention': return 'status-warning';
       case 'Critical': return 'status-critical';
@@ -82,21 +82,21 @@ const PdpCard = ({ plot }) => {
           {plot.status}
         </span>
       </div>
-      
+
       <div className="pdp-chart-container">
         <ResponsiveContainer width="100%" height={250}>
           <ComposedChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid stroke="#f1f5f9" vertical={false} />
-            <XAxis 
-              dataKey="x" 
-              type="number" 
+            <XAxis
+              dataKey="x"
+              type="number"
               domain={['dataMin', 'dataMax']}
               tick={{ fontSize: 12, fill: '#94a3b8' }}
               axisLine={{ stroke: '#e2e8f0' }}
               tickLine={{ stroke: '#e2e8f0' }}
             />
-            <YAxis 
-              dataKey="y" 
+            <YAxis
+              dataKey="y"
               type="number"
               domain={['dataMin', 'dataMax']}
               tick={{ fontSize: 12, fill: '#94a3b8' }}
@@ -104,29 +104,26 @@ const PdpCard = ({ plot }) => {
               tickLine={false}
             />
             <Tooltip content={<CustomPdpTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            
-            {/* The Average Risk Curve */}
-            <Line 
-              type="monotone" 
-              dataKey="y" 
-              data={plot.curve} 
-              stroke="#94a3b8" 
-              strokeWidth={2} 
-              dot={false} 
-              name="Average Risk" 
+
+            <Line
+              type="monotone"
+              dataKey="y"
+              data={plot.curve}
+              stroke="#94a3b8"
+              strokeWidth={2}
+              dot={false}
+              name="Average Risk"
               isAnimationActive={false}
             />
-            
-            {/* The Hospital's Specific Point */}
-            <Scatter 
-              data={[plot.hospital_point]} 
-              fill="#b91c1c" 
-              shape="circle" 
-              r={6} 
+
+            <Scatter
+              data={[plot.hospital_point]}
+              fill="#b91c1c"
+              shape="circle"
+              r={6}
               z={10}
               name="Current Hospital"
-            >
-            </Scatter>
+            />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
@@ -169,6 +166,7 @@ const HospitalDetails = () => {
     const fetchDetails = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const response = await axios.post(`${API_BASE_URL}/explainability/individual`, {
           hospital_name: hospitalName
@@ -212,9 +210,8 @@ const HospitalDetails = () => {
 
   const { hospital, waterfall, tree_vote, pdp_plots } = data;
 
-  // Helper for Tier Badge
   const getTierClass = (tier) => {
-    switch(tier) {
+    switch (tier) {
       case 'Low': return 'badge-low';
       case 'Medium': return 'badge-medium';
       case 'High': return 'badge-high';
@@ -226,15 +223,14 @@ const HospitalDetails = () => {
   return (
     <div className="hospital-details-page">
       <Header onLogout={handleLogout} />
-      
+
       <main className="details-main">
-        {/* Section 1: Summary */}
         <div className="detail-header">
           <button onClick={() => navigate(-1)} className="back-btn">
             <ArrowLeft size={18} />
             Back to Dashboard
           </button>
-          
+
           <div className="summary-card">
             <div className="summary-info">
               <h1 className="hospital-name">{hospital.hospital_name}</h1>
@@ -259,7 +255,7 @@ const HospitalDetails = () => {
                 <span className="metric-label">Risk Score</span>
                 <span className="metric-value">{hospital.risk_score.toFixed(1)}</span>
               </div>
-              
+
               <div className="metric-box">
                 <span className="metric-label">Risk Tier</span>
                 <span className={`badge ${getTierClass(hospital.risk_tier)}`}>
@@ -285,8 +281,6 @@ const HospitalDetails = () => {
         </div>
 
         <div className="content-grid">
-          
-          {/* Section 2: Waterfall Chart */}
           <div className="card waterfall-card">
             <div className="card-header">
               <h3>Feature Contribution</h3>
@@ -298,15 +292,15 @@ const HospitalDetails = () => {
                   <div className="feature-label">{feat.feature}</div>
                   <div className="bar-area">
                     {feat.direction === 'decrease' && (
-                      <div 
-                        className="bar-bar decrease" 
+                      <div
+                        className="bar-bar decrease"
                         style={{ width: `${Math.min(Math.abs(feat.shap_value) * 100, 100)}%` }}
                       ></div>
                     )}
                     <div className="center-line"></div>
                     {feat.direction === 'increase' && (
-                      <div 
-                        className="bar-bar increase" 
+                      <div
+                        className="bar-bar increase"
                         style={{ width: `${Math.min(Math.abs(feat.shap_value) * 100, 100)}%` }}
                       ></div>
                     )}
@@ -317,7 +311,6 @@ const HospitalDetails = () => {
             </div>
           </div>
 
-          {/* Section 3: Tree Vote */}
           <div className="card tree-vote-card">
             <div className="card-header">
               <h3>Model Consensus</h3>
@@ -344,13 +337,12 @@ const HospitalDetails = () => {
             </div>
           </div>
 
-          {/* Section 4: PDP Plots (Replaces Action Cards) */}
           <div className="card pdp-section-card full-width">
             <div className="card-header">
               <h3>Feature Action Curves</h3>
               <p className="subtitle">How predicted risk changes as features change, with your hospital highlighted</p>
             </div>
-            
+
             {!pdp_plots || pdp_plots.length === 0 ? (
               <div className="pdp-empty-state">No feature analysis data available.</div>
             ) : (
@@ -361,7 +353,6 @@ const HospitalDetails = () => {
               </div>
             )}
           </div>
-
         </div>
       </main>
     </div>
