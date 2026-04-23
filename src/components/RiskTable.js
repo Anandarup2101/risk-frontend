@@ -62,7 +62,10 @@ function RiskTable({ tableData }) {
 
   // --- NAVIGATION ---
   const handleViewClick = (hospitalName) => {
-    navigate('/hospital-details', { state: { hospitalName } });
+    // navigate('/hospital-details', { state: { hospitalName } });
+
+    localStorage.setItem('selectedHospitalName', hospitalName);
+navigate('/hospital-details', { state: { hospitalName } });
   };
 
   // --- RENDER HELPERS ---
