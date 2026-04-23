@@ -1,21 +1,32 @@
 /* -----------------------------
+   GLOBAL (SCROLL CONTROL)
+----------------------------- */
+
+.no-scroll {
+  overflow: hidden;
+}
+
+/* -----------------------------
    LOGIN PAGE CONTAINER
 ----------------------------- */
 
 .login-container {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
   /* Background Image + Overlay */
-  background: 
+  background:
     linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
     url('../assets/background.png');
 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* -----------------------------
@@ -29,7 +40,7 @@
   width: 100%;
   max-width: 400px;
 
-  box-shadow: 
+  box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.08),
     0 4px 10px rgba(0, 0, 0, 0.04);
 
@@ -43,7 +54,7 @@
 .login-title {
   text-align: center;
   margin-bottom: 32px;
-  color: #D71500; /* JNJ Red */
+  color: #D71500;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -65,8 +76,6 @@
   font-weight: 500;
 }
 
-/* INPUT */
-
 .form-input {
   width: 100%;
   padding: 10px 12px;
@@ -75,7 +84,6 @@
 
   font-size: 14px;
   outline: none;
-
   transition: all 0.2s ease;
 }
 
@@ -123,19 +131,4 @@
   font-size: 0.85rem;
   margin-bottom: 12px;
   text-align: center;
-}
-
-/* -----------------------------
-   RESPONSIVE
------------------------------ */
-
-@media (max-width: 480px) {
-  .login-card {
-    padding: 32px 24px;
-    border-radius: 16px;
-  }
-
-  .login-title {
-    font-size: 20px;
-  }
 }
