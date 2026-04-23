@@ -1,0 +1,36 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF5F3 0%, #FFE5E5 100%);
+}
+
+.login-card {
+  background: white;
+  padding: 48px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #D71500;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.error-message {
+  color: #D71500;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  text-align: center;
+}

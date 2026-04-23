@@ -1,0 +1,489 @@
+/* -------- SECTION -------- */
+.advanced-analytics {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* -------- BUTTONS -------- */
+.analytics-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.analytics-btn {
+  width: 100%;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: all 0.22s ease;
+}
+
+.analytics-btn:hover {
+  border-color: #d0d5dd;
+  background: #fcfcfd;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.analytics-btn:active {
+  transform: translateY(0);
+}
+
+.icon-wrap {
+  padding: 8px;
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
+  border-radius: 10px;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* -------- MODAL -------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(248, 250, 252, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+  width: min(1180px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 22px 28px;
+  border-bottom: 1px solid #eef2f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.22s ease;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.btn-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-close {
+  background: #ffffff;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #eef2f6;
+}
+
+/* -------- BODY -------- */
+.modal-body {
+  padding: 24px 28px 28px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 460px;
+  background: #ffffff;
+}
+
+/* -------- CHART WRAPPER -------- */
+.chart-container {
+  height: 560px;
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+  border: 1px solid #eef2f6;
+  border-radius: 20px;
+  padding: 18px 18px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-title {
+  font-size: 15px;
+  color: #344054;
+  margin-bottom: 4px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-right: 120px;
+}
+
+.chart-subtitle {
+  font-size: 12px;
+  color: #667085;
+  margin-bottom: 16px;
+  line-height: 1.45;
+  padding-right: 120px;
+}
+
+/* -------- MAP POLISH -------- */
+.chart-container .leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 16px;
+  background: #eef4f8;
+  font-family: inherit;
+}
+
+.chart-container .leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.chart-container .leaflet-control-zoom a {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  color: #334155;
+  background: #ffffff;
+  border-bottom: 1px solid #eef2f6;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.chart-container .leaflet-control-zoom a:last-child {
+  border-bottom: none;
+}
+
+.chart-container .leaflet-control-zoom a:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.chart-container .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.88);
+  color: #667085;
+  border-radius: 8px 0 0 0;
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.chart-container .leaflet-pane,
+.chart-container .leaflet-top,
+.chart-container .leaflet-bottom {
+  z-index: 400;
+}
+
+/* -------- LEAFLET TOOLTIP -------- */
+.chart-container .leaflet-tooltip {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+  color: #334155;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.chart-container .leaflet-tooltip-top:before {
+  border-top-color: #ffffff;
+}
+
+.chart-container .leaflet-interactive {
+  transition: stroke-width 0.2s ease, fill-opacity 0.2s ease, transform 0.2s ease;
+}
+
+.chart-container .leaflet-interactive:hover {
+  fill-opacity: 1 !important;
+  stroke-width: 2.5 !important;
+}
+
+/* -------- RECHARTS POLISH -------- */
+.chart-container .recharts-cartesian-grid line {
+  stroke: #eef2f6;
+}
+
+.chart-container .recharts-cartesian-axis-tick-value {
+  fill: #667085;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chart-container .recharts-label {
+  fill: #475467;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chart-container .recharts-responsive-container {
+  min-height: 100%;
+}
+
+.chart-container .recharts-surface:focus,
+.chart-container .recharts-sector:focus,
+.chart-container .recharts-symbols:focus,
+.chart-container .recharts-scatter-symbol:focus,
+.chart-container .recharts-layer:focus {
+  outline: none;
+}
+
+.chart-container .recharts-wrapper {
+  font-family: inherit;
+}
+
+/* -------- QUADRANT / DETAIL LABELS -------- */
+.chart-container .quadrant-label,
+.chart-container .zone-label,
+.chart-container .detail-label {
+  position: absolute;
+  font-size: 11px;
+  line-height: 1.3;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #eef2f6;
+  color: #667085;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+  pointer-events: none;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.chart-container .zone-label.is-risk {
+  color: #b42318;
+  border-color: #fecdca;
+  background: rgba(254, 243, 242, 0.95);
+  font-weight: 600;
+}
+
+.chart-container .zone-label.is-neutral {
+  color: #667085;
+}
+
+/* -------- STATES -------- */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #98a2b3;
+  font-size: 14px;
+  background: #fafafa;
+  border-radius: 16px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.error-container {
+  padding: 16px 18px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  color: #991b1b;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* -------- RECHARTS TOOLTIP -------- */
+.custom-tooltip {
+  background: #ffffff;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.tooltip-header {
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 5px;
+}
+
+.tooltip-meta {
+  font-size: 11px;
+  color: #98a2b3;
+  margin-top: 5px;
+}
+
+/* -------- ANIMATIONS -------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.spin {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* -------- RESPONSIVE -------- */
+@media (max-width: 900px) {
+  .analytics-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-backdrop {
+    padding: 16px;
+  }
+
+  .modal-content {
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    padding: 18px 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .modal-body {
+    padding: 18px 20px 20px;
+    min-height: 380px;
+  }
+
+  .chart-container {
+    height: 500px;
+    padding: 16px 16px 12px;
+  }
+
+  .chart-title,
+  .chart-subtitle {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-btn {
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .icon-wrap {
+    padding: 7px;
+    border-radius: 8px;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-height: 95vh;
+    border-radius: 18px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .btn-icon {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .modal-body {
+    min-height: 320px;
+  }
+
+  .chart-container {
+    height: 420px;
+    border-radius: 16px;
+  }
+
+  .chart-subtitle {
+    margin-bottom: 12px;
+  }
+
+  .chart-container .leaflet-control-zoom a {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  .chart-container .quadrant-label,
+  .chart-container .zone-label,
+  .chart-container .detail-label {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
