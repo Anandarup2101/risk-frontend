@@ -33,6 +33,10 @@ const specialties = [
 
 const riskTiers = ["Low", "Medium", "High", "Critical"];
 
+const EXPOSURE_MIN = 100000;
+const EXPOSURE_MAX = 1000000;
+const EXPOSURE_STEP = 10000;
+
 function SidebarFilters({ filters, onApply }) {
   const [localFilters, setLocalFilters] = useState({
     location: {
@@ -64,10 +68,26 @@ function SidebarFilters({ filters, onApply }) {
   }, [debouncedFilters, filters, onApply]);
 
   const handleExposureChange = (field, value) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-      exposure_range: { ...prev.exposure_range, [field]: value }
-    }));
+    const numericValue = Number(value);
+
+    setLocalFilters((prev) => {
+      let minVal = Number(prev.exposure_range.min);
+      let maxVal = Number(prev.exposure_range.max);
+
+      if (field === 'min') {
+        minVal = Math.min(numericValue, maxVal);
+      } else {
+        maxVal = Math.max(numericValue, minVal);
+      }
+
+      return {
+        ...prev,
+        exposure_range: {
+          min: String(minVal),
+          max: String(maxVal)
+        }
+      };
+    });
   };
 
   const toggleArrayFilter = (category, value) => {
@@ -81,6 +101,14 @@ function SidebarFilters({ filters, onApply }) {
     });
   };
 
+  const minExposure = Number(localFilters.exposure_range.min);
+  const maxExposure = Number(localFilters.exposure_range.max);
+
+  const minPercent =
+    ((minExposure - EXPOSURE_MIN) / (EXPOSURE_MAX - EXPOSURE_MIN)) * 100;
+  const maxPercent =
+    ((maxExposure - EXPOSURE_MIN) / (EXPOSURE_MAX - EXPOSURE_MIN)) * 100;
+
   return (
     <div className="sidebar-content">
       <div className="filter-section">
@@ -93,7 +121,7 @@ function SidebarFilters({ filters, onApply }) {
                 checked={localFilters.specialty.includes(spec)}
                 onChange={() => toggleArrayFilter('specialty', spec)}
               />
-              {spec}
+              <span>{spec}</span>
             </label>
           ))}
         </div>
@@ -109,7 +137,7 @@ function SidebarFilters({ filters, onApply }) {
                 checked={localFilters.risk_tier.includes(tier)}
                 onChange={() => toggleArrayFilter('risk_tier', tier)}
               />
-              {tier}
+              <span>{tier}</span>
             </label>
           ))}
         </div>
@@ -119,29 +147,43 @@ function SidebarFilters({ filters, onApply }) {
         <h4>Exposure Range</h4>
         <div className="range-group">
           <div className="range-label">
-            Exposure (Min: ${Number(localFilters.exposure_range.min).toLocaleString()} / Max: ${Number(localFilters.exposure_range.max).toLocaleString()})
+            Exposure (${minExposure.toLocaleString()} - ${maxExposure.toLocaleString()})
           </div>
-          <div className="slider-row">
-            <span className="slider-sublabel">Min</span>
+
+          <div className="dual-range-wrapper">
+            <div className="slider-track"></div>
+            <div
+              className="slider-range"
+              style={{
+                left: `${minPercent}%`,
+                width: `${maxPercent - minPercent}%`
+              }}
+            ></div>
+
             <input
               type="range"
-              min="100000"
-              max="1000000"
-              step="10000"
-              value={localFilters.exposure_range.min}
+              min={EXPOSURE_MIN}
+              max={EXPOSURE_MAX}
+              step={EXPOSURE_STEP}
+              value={minExposure}
               onChange={(e) => handleExposureChange('min', e.target.value)}
-              className="range-input"
+              className="thumb thumb-left"
             />
-            <span className="slider-sublabel">Max</span>
+
             <input
               type="range"
-              min="100000"
-              max="1000000"
-              step="10000"
-              value={localFilters.exposure_range.max}
+              min={EXPOSURE_MIN}
+              max={EXPOSURE_MAX}
+              step={EXPOSURE_STEP}
+              value={maxExposure}
               onChange={(e) => handleExposureChange('max', e.target.value)}
-              className="range-input"
+              className="thumb thumb-right"
             />
+          </div>
+
+          <div className="range-values-row">
+            <span className="slider-sublabel">Min: ${minExposure.toLocaleString()}</span>
+            <span className="slider-sublabel">Max: ${maxExposure.toLocaleString()}</span>
           </div>
         </div>
       </div>

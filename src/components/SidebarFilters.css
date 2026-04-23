@@ -1,4 +1,3 @@
-/* Wrapper (Transparent, inside unified sidebar) */
 .sidebar-content {
   display: flex;
   flex-direction: column;
@@ -14,11 +13,10 @@
   letter-spacing: 0.05em;
 }
 
-/* --- Range Slider Styles --- */
 .range-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
@@ -32,68 +30,100 @@
   border: 1px solid #e2e8f0;
 }
 
-.slider-row {
+.dual-range-wrapper {
+  position: relative;
+  width: 100%;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
-.slider-sublabel {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 600;
-  min-width: 30px;
-  text-align: center;
-}
-
-/* Custom Range Input Styling */
-input[type="range"] {
-  /* -webkit-appearance: none; */
+.slider-track {
+  position: absolute;
   width: 100%;
   height: 4px;
   background: #e2e8f0;
-  border-radius: 2px;
-  outline: none;
-  transition: background 0.2s;
+  border-radius: 999px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-input[type="range"]::-webkit-slider-thumb {
+.slider-range {
+  position: absolute;
+  height: 4px;
+  background: #D71500;
+  border-radius: 999px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.thumb {
+  position: absolute;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: none;
+  margin: 0;
+}
+
+.thumb::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.thumb::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
+.thumb::-webkit-slider-thumb {
+  pointer-events: auto;
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
   height: 16px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #cbd5e1;
+  border: 2px solid #D71500;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  margin-top: -6px;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  transform: scale(1.1);
-}
-
-input[type="range"]::-moz-range-thumb {
+.thumb::-moz-range-thumb {
+  pointer-events: auto;
   width: 16px;
   height: 16px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #cbd5e1;
+  border: 2px solid #D71500;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-input[type="range"]::-moz-range-thumb:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  transform: scale(1.1);
+.thumb-left {
+  z-index: 3;
 }
 
-/* --- Checkbox Styles (Retained) --- */
+.thumb-right {
+  z-index: 4;
+}
+
+.range-values-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-sublabel {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
 .checkbox-group {
   display: flex;
   flex-direction: column;
