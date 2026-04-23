@@ -1,36 +1,141 @@
+/* -----------------------------
+   LOGIN PAGE CONTAINER
+----------------------------- */
+
 .login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FFF5F3 0%, #FFE5E5 100%);
+
+  /* Background Image + Overlay */
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+    url('../assets/background.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
+/* -----------------------------
+   LOGIN CARD
+----------------------------- */
+
 .login-card {
-  background: white;
+  background: #ffffff;
   padding: 48px;
   border-radius: 20px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.04);
+
+  border: 1px solid #f1f5f9;
 }
+
+/* -----------------------------
+   TITLE
+----------------------------- */
 
 .login-title {
   text-align: center;
   margin-bottom: 32px;
-  color: #D71500;
+  color: #D71500; /* JNJ Red */
   font-size: 24px;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/* -----------------------------
+   FORM
+----------------------------- */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* INPUT */
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  font-size: 14px;
+  outline: none;
+
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: #D71500;
+  box-shadow: 0 0 0 2px rgba(215, 21, 0, 0.1);
+}
+
+/* -----------------------------
+   BUTTON
+----------------------------- */
 
 .login-btn {
   width: 100%;
   margin-top: 16px;
+  padding: 12px;
+
+  background-color: #D71500;
+  color: white;
+  border: none;
+  border-radius: 8px;
+
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
 }
+
+.login-btn:hover {
+  background-color: #b91300;
+}
+
+.login-btn:disabled {
+  background-color: #fca5a5;
+  cursor: not-allowed;
+}
+
+/* -----------------------------
+   ERROR MESSAGE
+----------------------------- */
 
 .error-message {
   color: #D71500;
   font-size: 0.85rem;
   margin-bottom: 12px;
   text-align: center;
+}
+
+/* -----------------------------
+   RESPONSIVE
+----------------------------- */
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
 }
