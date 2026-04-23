@@ -169,7 +169,7 @@ const GlobalShapExplainer = () => {
     setError(null);
 
     try {
-      const response = await api.get(`/explainability/global`);
+      const response = await api.get(`/global-shap`);
       if (!response.data || (!response.data.shap_summary && !response.data.shap_bar)) {
         throw new Error("Invalid response structure");
       }

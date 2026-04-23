@@ -167,7 +167,7 @@ const HospitalDetails = () => {
       setError(null);
 
       try {
-        const response = await api.post(`/explainability/individual`, {
+        const response = await api.post(`/individual-hospital`, {
           hospital_name: hospitalName
         });
         setData(response.data);
