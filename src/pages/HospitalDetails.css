@@ -298,8 +298,9 @@ h1, h2, h3, h4 {
 .stat-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  align-items: center;      /* 👈 horizontal center */
+  justify-content: center;  /* 👈 vertical center (if height given) */
+  text-align: center;       /* 👈 text center */
 }
 
 .stat-item .count {

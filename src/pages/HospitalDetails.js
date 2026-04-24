@@ -344,7 +344,7 @@ const HospitalDetails = () => {
           <div className="card tree-vote-card">
             <div className="card-header">
               <h3>Model Consensus</h3>
-              <p className="subtitle">Decision tree voting split</p>
+              <p className="subtitle">Risk Signal Breakdown</p>
             </div>
             <div className="vote-visual">
               <div className="vote-percent">
@@ -364,11 +364,11 @@ const HospitalDetails = () => {
               <div className="vote-stats">
                 <div className="stat-item">
                   <span className="count">{Number(tree_vote.yes_votes || 0)}</span>
-                  <span className="label">Trees Voted Risk</span>
+                  <span className="label">Warning Indicators <p>-  High Risk Signals</p></span>
                 </div>
                 <div className="stat-item">
                   <span className="count">{Number(tree_vote.no_votes || 0)}</span>
-                  <span className="label">Trees Voted Safe</span>
+                  <span className="label">Confidence in Stability <p>   - Low Risk Signals</p></span>
                 </div>
               </div>
             </div>

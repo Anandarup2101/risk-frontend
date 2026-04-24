@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-// import axios from 'axios';
 import {
   ScatterChart,
   Scatter,
@@ -12,61 +11,35 @@ import {
   Cell
 } from 'recharts';
 import './AdvancedAnalytics.css';
-import api from '../api'; 
+import api from '../api';
+
 import {
   MapContainer,
   TileLayer,
   CircleMarker,
   Tooltip as LeafletTooltip
 } from 'react-leaflet';
+
 import 'leaflet/dist/leaflet.css';
 
-
-// ---------------- INLINE ICONS ----------------
+/* ---------------- ICONS ---------------- */
 
 const MapIcon = ({ size = 24, color = 'currentColor' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
     <polygon points="1 6 1 22 8 18 16 18 23 6"></polygon>
     <circle cx="12" cy="12" r="3"></circle>
   </svg>
 );
 
 const ScatterIcon = ({ size = 24, color = 'currentColor' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
     <circle cx="12" cy="12" r="10"></circle>
     <circle cx="12" cy="12" r="4"></circle>
   </svg>
 );
 
 const XIcon = ({ size = 24, color = 'currentColor' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
     <line x1="18" y1="6" x2="6" y2="18"></line>
     <line x1="6" y1="6" x2="18" y2="18"></line>
   </svg>
@@ -81,16 +54,14 @@ const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
     fill="none"
     stroke={color}
     strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
   >
     <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
   </svg>
 );
 
-// ---------------- COLOR HELPERS ----------------
+/* ---------------- COLORS ---------------- */
 
-const CLUSTER_COLORS = ['#3b82f6', '#0f766e', '#6366f1', '#0d9488', '#4338ca'];
+const CLUSTER_COLORS = ['#5C0011', '#D71500', '#F97316', '#FACC15', '#9CA3AF'];
 
 const getClusterColor = (id) => CLUSTER_COLORS[id % CLUSTER_COLORS.length];
 
@@ -102,7 +73,7 @@ const getRiskColor = (risk) => {
   return '#22c55e';
 };
 
-// ---------------- HELPERS ----------------
+/* ---------------- HELPERS ---------------- */
 
 const sanitizeGeoPoints = (points = []) =>
   points
@@ -164,13 +135,8 @@ const buildGeoPayload = (filters) => {
     }
   };
 
-  if (filters?.specialty?.length) {
-    payload.specialty = filters.specialty;
-  }
-
-  if (filters?.risk_tier?.length) {
-    payload.risk_tier = filters.risk_tier;
-  }
+  if (filters?.specialty?.length) payload.specialty = filters.specialty;
+  if (filters?.risk_tier?.length) payload.risk_tier = filters.risk_tier;
 
   return payload;
 };
@@ -192,55 +158,30 @@ const buildClusterPayload = (filters) => {
     n_clusters: 3
   };
 
-  if (filters?.specialty?.length) {
-    payload.filters.specialty = filters.specialty;
-  }
-
-  if (filters?.risk_tier?.length) {
-    payload.filters.risk_tier = filters.risk_tier;
-  }
+  if (filters?.specialty?.length) payload.filters.specialty = filters.specialty;
+  if (filters?.risk_tier?.length) payload.filters.risk_tier = filters.risk_tier;
 
   return payload;
 };
 
-// ---------------- CHART COMPONENTS ----------------
+/* ---------------- GEO MAP ---------------- */
 
 const GeoHeatmapChart = ({ data }) => {
   const points = useMemo(() => sanitizeGeoPoints(data?.points || []), [data]);
   const { center, bounds } = useMemo(() => getMapBounds(points), [points]);
 
   if (!points.length) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          color: '#94a3b8',
-          fontSize: 14
-        }}
-      >
-        No valid geographic data available
-      </div>
-    );
+    return <div className="empty-state">No valid geographic data available</div>;
   }
 
   return (
-    <div className="chart-container" style={{ position: 'relative' }}>
+    <div className="chart-container">
       <div className="chart-title">Geographic Risk Intensity</div>
       <div className="chart-subtitle">
         Hospital locations colored by risk intensity
       </div>
 
-      <div
-        style={{
-          height: 'calc(100% - 52px)',
-          width: '100%',
-          borderRadius: 8,
-          overflow: 'hidden'
-        }}
-      >
+      <div className="map-body">
         <MapContainer
           center={center}
           bounds={bounds}
@@ -271,171 +212,36 @@ const GeoHeatmapChart = ({ data }) => {
                   <div style={{ fontWeight: 700, marginBottom: 4 }}>
                     {p.hospital_name || 'Unknown'}
                   </div>
-                  <div>
-                    Risk: <strong>{p.risk_percent.toFixed(1)}%</strong>
-                  </div>
+                  <div>Risk: <strong>{p.risk_percent.toFixed(1)}%</strong></div>
                   <div>Tier: {p.risk_tier || 'N/A'}</div>
                   <div>Specialty: {p.specialty || 'N/A'}</div>
-                  {p.ar_exposure !== undefined && p.ar_exposure !== null && (
-                    <div>
-                      Exposure:{' '}
-                      {Number(p.ar_exposure).toLocaleString('en-US', {
-                        maximumFractionDigits: 0
-                      })}
-                    </div>
-                  )}
-                  {p.dso_30d !== undefined && p.dso_30d !== null && (
-                    <div>DSO 30d: {p.dso_30d}</div>
-                  )}
-                  <div style={{ color: '#64748b', fontSize: 11, marginTop: 4 }}>
-                    Lat {p.latitude.toFixed(4)} | Lon {p.longitude.toFixed(4)}
-                  </div>
+                  <div>Exposure: {Number(p.ar_exposure || 0).toLocaleString()}</div>
+                  <div>DSO 30d: {p.dso_30d || 0}</div>
                 </div>
               </LeafletTooltip>
             </CircleMarker>
           ))}
         </MapContainer>
       </div>
-
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 32,
-          right: 12,
-          background: 'rgba(255,255,255,0.92)',
-          borderRadius: 6,
-          padding: '6px 10px',
-          fontSize: 11,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3
-        }}
-      >
-        {[
-          { label: '≥ 75%', color: '#ef4444' },
-          { label: '50–74%', color: '#f97316' },
-          { label: '25–49%', color: '#eab308' },
-          { label: '< 25%', color: '#22c55e' }
-        ].map(({ label, color }) => (
-          <div
-            key={label}
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <span
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: color,
-                display: 'inline-block',
-                border: '1.5px solid #fff',
-                boxShadow: '0 0 0 1px #ccc'
-              }}
-            />
-            <span style={{ color: '#334155' }}>{label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
 
-// const ClusterScatterChart = ({ data }) => {
-//   const chartData = useMemo(() => {
-//     if (!data || !data.clusters) return [];
+/* ---------------- CLUSTER SCATTER ---------------- */
 
-//     const allPoints = [];
-//     data.clusters.forEach((cluster) => {
-//       const points = cluster.points || [];
-//       points.forEach((point) => {
-//         allPoints.push({
-//           ...point,
-//           clusterColor: getClusterColor(cluster.cluster_id)
-//         });
-//       });
-//     });
-//     return allPoints;
-//   }, [data]);
-
-//   if (!chartData.length) {
-//     return <div className="empty-state">No Cluster Data</div>;
-//   }
-
-//   return (
-//     <div className="chart-container">
-//       <div className="chart-title">Clustered Risk Exposure</div>
-
-//       <ResponsiveContainer width="100%" height="100%">
-//         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-//           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-//           <XAxis
-//             dataKey="x"
-//             type="number"
-//             name="DSO (30D)"
-//             tick={{ fontSize: 12 }}
-//             stroke="#94a3b8"
-//           />
-//           <YAxis
-//             dataKey="y"
-//             type="number"
-//             name="Credit Used"
-//             tick={{ fontSize: 12 }}
-//             stroke="#94a3b8"
-//           />
-//           <ZAxis dataKey="risk_percent" range={[50, 400]} name="Risk %" />
-
-//           <RechartsTooltip
-//             cursor={{ strokeDasharray: '3 3' }}
-//             content={({ active, payload }) => {
-//               if (active && payload && payload.length) {
-//                 const p = payload[0].payload;
-//                 return (
-//                   <div className="custom-tooltip">
-//                     <div className="tooltip-header">{p.hospital_name}</div>
-//                     <div>
-//                       Cluster:{' '}
-//                       <span
-//                         style={{ color: p.clusterColor, fontWeight: 'bold' }}
-//                       >
-//                         #{(p.cluster ?? 0) + 1}
-//                       </span>
-//                     </div>
-//                     <div>
-//                       Risk: <strong>{Number(p.risk_percent || 0).toFixed(1)}%</strong>
-//                     </div>
-//                     <div className="tooltip-meta">
-//                       DSO: {p.x} | Credit: {p.y}
-//                     </div>
-//                   </div>
-//                 );
-//               }
-//               return null;
-//             }}
-//           />
-
-//           <Scatter data={chartData} shape="circle">
-//             {chartData.map((entry, index) => (
-//               <Cell
-//                 key={`cell-${index}`}
-//                 fill={entry.clusterColor}
-//                 stroke="#ffffff"
-//                 strokeWidth={1.5}
-//               />
-//             ))}
-//           </Scatter>
-//         </ScatterChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// };
+const ZoneBadge = ({ className = '', style = {}, title, meaning }) => (
+  <div className={`zone-badge ${className}`} style={style}>
+    {title}
+    <div className="zone-tooltip">{meaning}</div>
+  </div>
+);
 
 const ClusterScatterChart = ({ data }) => {
   const chartData = useMemo(() => {
     if (!data || !data.clusters) return [];
 
     const allPoints = [];
+
     data.clusters.forEach((cluster) => {
       (cluster.points || []).forEach((point) => {
         allPoints.push({
@@ -444,6 +250,7 @@ const ClusterScatterChart = ({ data }) => {
         });
       });
     });
+
     return allPoints;
   }, [data]);
 
@@ -452,145 +259,148 @@ const ClusterScatterChart = ({ data }) => {
   }
 
   return (
-    <div className="chart-container" style={{ position: 'relative' }}>
+    <div className="chart-container cluster-chart-container">
       <div className="chart-title">Clustered Risk Exposure</div>
       <div className="chart-subtitle">
         Payment delay vs credit usage with risk intensity and clustering
       </div>
 
-      <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart margin={{ top: 40, right: 30, bottom: 40, left: 40 }}>
-          
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+      <div className="cluster-chart-body">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart margin={{ top: 40, right: 30, bottom: 40, left: 40 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
 
-          {/* X Axis */}
-          <XAxis
-            dataKey="x"
-            type="number"
-            name="DSO (30D)"
-            label={{
-              value: 'Payment Delay (DSO - 30 Days)',
-              position: 'bottom',
-              offset: 10,
-              style: { fontSize: 12, fill: '#475467', fontWeight: 600 }
-            }}
-            tick={{ fontSize: 11 }}
-            stroke="#94a3b8"
-          />
+            <XAxis
+              dataKey="x"
+              type="number"
+              name="DSO (30D)"
+              label={{
+                value: 'Payment Delay (DSO - 30 Days)',
+                position: 'bottom',
+                offset: 10,
+                style: { fontSize: 12, fill: '#475467', fontWeight: 600 }
+              }}
+              tick={{ fontSize: 11 }}
+              stroke="#94a3b8"
+            />
 
-          {/* Y Axis */}
-          <YAxis
-            dataKey="y"
-            type="number"
-            name="Credit Used"
-            label={{
-              value: 'Credit Utilization',
-              angle: -90,
-              position: 'insideLeft',
-              style: { fontSize: 12, fill: '#475467', fontWeight: 600 }
-            }}
-            tick={{ fontSize: 11 }}
-            stroke="#94a3b8"
-          />
+            <YAxis
+              dataKey="y"
+              type="number"
+              name="Credit Used"
+              label={{
+                value: 'Credit Utilization',
+                angle: -90,
+                position: 'insideLeft',
+                style: { fontSize: 12, fill: '#475467', fontWeight: 600 }
+              }}
+              tick={{ fontSize: 11 }}
+              stroke="#94a3b8"
+            />
 
-          {/* Bubble size */}
-          <ZAxis
-            dataKey="risk_percent"
-            range={[60, 400]}
-            name="Risk %"
-          />
+            <ZAxis
+              dataKey="risk_percent"
+              range={[60, 400]}
+              name="Risk %"
+            />
 
-          {/* Tooltip */}
-          <RechartsTooltip
-            cursor={{ strokeDasharray: '3 3' }}
-            content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const p = payload[0].payload;
-                return (
-                  <div className="custom-tooltip">
-                    <div className="tooltip-header">{p.hospital_name}</div>
-                    <div>
-                      Cluster:{' '}
-                      <span style={{ color: p.clusterColor, fontWeight: 'bold' }}>
-                        #{(p.cluster ?? 0) + 1}
-                      </span>
+            <RechartsTooltip
+              cursor={{ strokeDasharray: '3 3' }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const p = payload[0].payload;
+
+                  return (
+                    <div className="custom-tooltip">
+                      <div className="tooltip-header">
+                        {p.hospital_name || 'Unknown Hospital'}
+                      </div>
+
+                      <div className="tooltip-row">
+                        Cluster:{' '}
+                        <span style={{ color: p.clusterColor, fontWeight: 700 }}>
+                          #{(p.cluster ?? 0) + 1}
+                        </span>
+                      </div>
+
+                      <div className="tooltip-row">
+                        Risk:{' '}
+                        <strong>{Number(p.risk_percent || 0).toFixed(1)}%</strong>
+                      </div>
+
+                      <div className="tooltip-meta">
+                        DSO: {p.x} | Credit: {p.y}
+                      </div>
                     </div>
-                    <div>
-                      Risk: <strong>{Number(p.risk_percent || 0).toFixed(1)}%</strong>
-                    </div>
-                    <div className="tooltip-meta">
-                      DSO: {p.x} | Credit: {p.y}
-                    </div>
-                  </div>
-                );
-              }
-              return null;
-            }}
-          />
+                  );
+                }
 
-          {/* Scatter */}
-          <Scatter data={chartData} shape="circle">
-            {chartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.clusterColor}
-                stroke="#ffffff"
-                strokeWidth={1.5}
-              />
-            ))}
-          </Scatter>
+                return null;
+              }}
+            />
 
-        </ScatterChart>
-      </ResponsiveContainer>
-
-      {/* -------- QUADRANT LABELS -------- */}
-      <div style={{
-        position: 'absolute',
-        top: 70,
-        left: 60,
-        fontSize: 11,
-        color: '#667085'
-      }}>
-        Stable Zone
+            <Scatter data={chartData} shape="circle">
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.clusterColor}
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
       </div>
 
-      <div style={{
-        position: 'absolute',
-        top: 70,
-        right: 40,
-        fontSize: 11,
-        color: '#D32F2F',
-        fontWeight: 600
-      }}>
-        High Risk Zone
-      </div>
+      <ZoneBadge
+        title="Stable Zone"
+        meaning="Low payment delay and controlled credit usage. These hospitals are financially stable."
+        className="top-left-zone"
+        style={{
+          position: 'absolute',
+          top: 70,
+          left: 60
+        }}
+      />
 
-      <div style={{
-        position: 'absolute',
-        bottom: 30,
-        left: 60,
-        fontSize: 11,
-        color: '#667085'
-      }}>
-        Low Credit / Low Delay
-      </div>
+      <ZoneBadge
+        title="High Risk Zone"
+        meaning="High payment delay and high credit usage. These hospitals need immediate attention."
+        className="danger top-right-zone"
+        style={{
+          position: 'absolute',
+          top: 70,
+          right: 40
+        }}
+      />
 
-      <div style={{
-        position: 'absolute',
-        bottom: 30,
-        right: 40,
-        fontSize: 11,
-        // color: '#D32F2F',
-        fontWeight: 600
-      }}>
-        Watchlist
-      </div>
+      <ZoneBadge
+        title="Low Credit / Low Risk"
+        meaning="Low credit usage and low payment delay. Exposure risk is currently limited."
+        className="bottom-zone bottom-left-zone"
+        style={{
+          position: 'absolute',
+          bottom: 52,
+          left: 60
+        }}
+      />
 
+      <ZoneBadge
+        title="Watchlist"
+        meaning="Delay or exposure signals are emerging. Monitor these hospitals closely."
+        className="warning bottom-zone bottom-right-zone"
+        style={{
+          position: 'absolute',
+          bottom: 52,
+          right: 40
+        }}
+      />
     </div>
   );
 };
 
-// ---------------- MAIN COMPONENT ----------------
+/* ---------------- MAIN ---------------- */
 
 const AdvancedAnalytics = ({ filters }) => {
   const [geoState, setGeoState] = useState({
@@ -609,7 +419,6 @@ const AdvancedAnalytics = ({ filters }) => {
     lastFetched: null
   });
 
-  // Clear cached analytics whenever filters change
   useEffect(() => {
     setGeoState((prev) => ({
       ...prev,
@@ -627,19 +436,10 @@ const AdvancedAnalytics = ({ filters }) => {
   }, [filters]);
 
   const fetchGeoData = useCallback(async () => {
-    setGeoState((prev) => ({
-      ...prev,
-      loading: true,
-      error: null
-    }));
+    setGeoState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const payload = buildGeoPayload(filters);
-
-      const response = await api.post(
-        `/charts/geo-heatmap`,
-        payload
-      );
+      const response = await api.post('/charts/geo-heatmap', buildGeoPayload(filters));
 
       setGeoState((prev) => ({
         ...prev,
@@ -658,19 +458,10 @@ const AdvancedAnalytics = ({ filters }) => {
   }, [filters]);
 
   const fetchClusterData = useCallback(async () => {
-    setClusterState((prev) => ({
-      ...prev,
-      loading: true,
-      error: null
-    }));
+    setClusterState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const payload = buildClusterPayload(filters);
-
-      const response = await api.post(
-        `/charts/cluster-scatter`,
-        payload
-      );
+      const response = await api.post('/charts/cluster-scatter', buildClusterPayload(filters));
 
       setClusterState((prev) => ({
         ...prev,
@@ -691,9 +482,7 @@ const AdvancedAnalytics = ({ filters }) => {
   const handleGeoClick = async () => {
     setGeoState((prev) => ({ ...prev, isOpen: true }));
 
-    if (geoState.data && geoState.lastFetched) {
-      return;
-    }
+    if (geoState.data && geoState.lastFetched) return;
 
     await fetchGeoData();
   };
@@ -701,18 +490,8 @@ const AdvancedAnalytics = ({ filters }) => {
   const handleClusterClick = async () => {
     setClusterState((prev) => ({ ...prev, isOpen: true }));
 
-    if (clusterState.data && clusterState.lastFetched) {
-      return;
-    }
+    if (clusterState.data && clusterState.lastFetched) return;
 
-    await fetchClusterData();
-  };
-
-  const refreshGeo = async () => {
-    await fetchGeoData();
-  };
-
-  const refreshCluster = async () => {
     await fetchClusterData();
   };
 
@@ -742,23 +521,15 @@ const AdvancedAnalytics = ({ filters }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{geoState.data?.title || 'Geographic Risk Heatmap'}</h3>
+
               <div className="modal-controls">
-                <button
-                  onClick={refreshGeo}
-                  disabled={geoState.loading}
-                  className="btn-icon"
-                >
-                  <RefreshIcon
-                    size={14}
-                    className={geoState.loading ? 'spin' : ''}
-                  />
+                <button onClick={fetchGeoData} disabled={geoState.loading} className="btn-icon">
+                  <RefreshIcon size={14} className={geoState.loading ? 'spin' : ''} />
                   Refresh
                 </button>
 
                 <button
-                  onClick={() =>
-                    setGeoState((prev) => ({ ...prev, isOpen: false }))
-                  }
+                  onClick={() => setGeoState((prev) => ({ ...prev, isOpen: false }))}
                   className="btn-close"
                 >
                   <XIcon size={20} />
@@ -769,7 +540,7 @@ const AdvancedAnalytics = ({ filters }) => {
             <div className="modal-body">
               {geoState.loading ? (
                 <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#3b82f6" />
+                  <RefreshIcon size={32} className="spin" color="#D71500" />
                 </div>
               ) : geoState.error ? (
                 <div className="error-container">Error: {geoState.error}</div>
@@ -784,30 +555,24 @@ const AdvancedAnalytics = ({ filters }) => {
       {clusterState.isOpen && (
         <div
           className="modal-backdrop"
-          onClick={() =>
-            setClusterState((prev) => ({ ...prev, isOpen: false }))
-          }
+          onClick={() => setClusterState((prev) => ({ ...prev, isOpen: false }))}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{clusterState.data?.title || 'Hospital Cluster Analysis'}</h3>
+
               <div className="modal-controls">
                 <button
-                  onClick={refreshCluster}
+                  onClick={fetchClusterData}
                   disabled={clusterState.loading}
                   className="btn-icon"
                 >
-                  <RefreshIcon
-                    size={14}
-                    className={clusterState.loading ? 'spin' : ''}
-                  />
+                  <RefreshIcon size={14} className={clusterState.loading ? 'spin' : ''} />
                   Refresh
                 </button>
 
                 <button
-                  onClick={() =>
-                    setClusterState((prev) => ({ ...prev, isOpen: false }))
-                  }
+                  onClick={() => setClusterState((prev) => ({ ...prev, isOpen: false }))}
                   className="btn-close"
                 >
                   <XIcon size={20} />
@@ -818,12 +583,10 @@ const AdvancedAnalytics = ({ filters }) => {
             <div className="modal-body">
               {clusterState.loading ? (
                 <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#3b82f6" />
+                  <RefreshIcon size={32} className="spin" color="#D71500" />
                 </div>
               ) : clusterState.error ? (
-                <div className="error-container">
-                  Error: {clusterState.error}
-                </div>
+                <div className="error-container">Error: {clusterState.error}</div>
               ) : (
                 <ClusterScatterChart data={clusterState.data} />
               )}

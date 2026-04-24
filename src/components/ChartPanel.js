@@ -27,6 +27,32 @@ function ChartPanel({ chartData }) {
     Critical: '#5c0011'
   };
 
+  // const SPECIALTY_COLORS = [
+  //   '#D71500',
+  //   '#5C0011',
+  //   '#F28B82',
+  //   '#D46B08',
+  //   '#F59E0B',
+  //   '#1A2E44',
+  //   '#64748B',
+  //   '#22C55E',
+  //   '#0EA5E9',
+  //   '#8B5CF6'
+  // ];
+
+const SPECIALTY_COLORS = [
+  '#5C0011', // deep maroon
+  '#8B0000', // dark red
+  '#B91C1C', // strong red
+  '#D32F2F', // primary red
+  '#F97316', // orange
+  '#FB8C00', // amber orange
+  '#F59E0B', // warm amber
+  '#FACC15', // yellow
+  '#E6E8EB', // light grey
+  '#9CA3AF'  // medium grey
+];
+
   const getDonutColor = (name) => {
     if (name === 'Low Risk') return '#22c55e';
     if (name === 'Medium Risk') return '#d46b08';
@@ -46,6 +72,13 @@ function ChartPanel({ chartData }) {
     }).format(value);
   };
 
+  const buildPieData = (donutPayload) => {
+    return (donutPayload?.labels || []).map((label, i) => ({
+      name: label,
+      value: Number(donutPayload.values?.[i] || 0)
+    })).filter((item) => item.value > 0);
+  };
+
   const renderChart = () => {
     if (!chartData) return <div className="no-data">No data available</div>;
 
@@ -54,6 +87,10 @@ function ChartPanel({ chartData }) {
         ...item,
         fill: item.risk === 1 ? (RISK_COLORS[item.risk_tier] || '#D71500') : '#22c55e'
       }));
+
+      if (!coloredBubbleData.length) {
+        return <div className="no-data">No data available</div>;
+      }
 
       return (
         <ResponsiveContainer width="100%" height={300}>
@@ -69,7 +106,6 @@ function ChartPanel({ chartData }) {
               dataKey="y"
               name="Credit Used"
               type="number"
-              domain={[0, 1]}
               label={{ value: 'Credit Used', angle: -90, position: 'insideLeft' }}
             />
             <ZAxis dataKey="size" range={[50, 400]} name="Total Payments" />
@@ -80,15 +116,7 @@ function ChartPanel({ chartData }) {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div
-                      style={{
-                        background: 'white',
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}
-                    >
+                    <div className="custom-tooltip">
                       <p style={{ fontWeight: 'bold', marginBottom: '4px' }}>{data.label}</p>
                       <p style={{ margin: 0 }}>DSO: {data.x}</p>
                       <p style={{ margin: 0 }}>Credit: {data.y}</p>
@@ -116,10 +144,11 @@ function ChartPanel({ chartData }) {
     }
 
     if (activeChart === 'donut') {
-      const data = (chartData.donut?.labels || []).map((label, i) => ({
-        name: label,
-        value: chartData.donut.values[i]
-      }));
+      const data = buildPieData(chartData.donut);
+
+      if (!data.length) {
+        return <div className="no-data">No data available</div>;
+      }
 
       return (
         <ResponsiveContainer width="100%" height={300}>
@@ -136,10 +165,7 @@ function ChartPanel({ chartData }) {
               labelLine={false}
             >
               {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={getDonutColor(entry.name)}
-                />
+                <Cell key={`cell-${index}`} fill={getDonutColor(entry.name)} />
               ))}
             </Pie>
 
@@ -155,6 +181,54 @@ function ChartPanel({ chartData }) {
                 const current = data[index]?.value || 0;
                 const pct = total ? ((current / total) * 100).toFixed(0) : 0;
                 return `${value} (${pct}%)`;
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    if (activeChart === 'specialty') {
+      const data = buildPieData(chartData.specialty_donut);
+
+      if (!data.length) {
+        return <div className="no-data">No specialty data available</div>;
+      }
+
+      return (
+        <ResponsiveContainer width="100%" height={330}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="38%"
+              cy="50%"
+              innerRadius={62}
+              outerRadius={90}
+              paddingAngle={3}
+              dataKey="value"
+              label={false}
+              labelLine={false}
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`specialty-cell-${index}`}
+                  fill={SPECIALTY_COLORS[index % SPECIALTY_COLORS.length]}
+                />
+              ))}
+            </Pie>
+
+            <Tooltip formatter={(value, name) => [`${value} hospitals`, name]} />
+
+            <Legend
+              layout="vertical"
+              verticalAlign="middle"
+              align="right"
+              iconType="circle"
+              formatter={(value, entry, index) => {
+                const total = data.reduce((sum, item) => sum + item.value, 0);
+                const current = data[index]?.value || 0;
+                const pct = total ? ((current / total) * 100).toFixed(0) : 0;
+                return `${value} (${current}, ${pct}%)`;
               }}
             />
           </PieChart>
@@ -204,15 +278,7 @@ function ChartPanel({ chartData }) {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div
-                      style={{
-                        background: 'white',
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}
-                    >
+                    <div className="custom-tooltip">
                       <p style={{ fontWeight: 'bold', marginBottom: '6px' }}>{label}</p>
                       <p style={{ margin: 0 }}>Total Exposure: {formatCurrency(data.total_exposure)}</p>
                       <p style={{ margin: 0 }}>Hospital Count: {data.hospital_count}</p>
@@ -267,12 +333,21 @@ function ChartPanel({ chartData }) {
           >
             Payment & Credit Risk
           </button>
+
           <button
             className={activeChart === 'donut' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('donut')}
           >
             Risk Breakdown
           </button>
+
+          <button
+            className={activeChart === 'specialty' ? 'toggle-btn active' : 'toggle-btn'}
+            onClick={() => setActiveChart('specialty')}
+          >
+            Specialty Breakdown
+          </button>
+
           <button
             className={activeChart === 'line' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('line')}

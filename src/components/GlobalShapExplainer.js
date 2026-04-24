@@ -41,7 +41,7 @@ const XIcon = ({ size = 24, color = "currentColor" }) => (
 
 // Color Logic: Red (Pos SHAP/Risk Increase) vs Green/Teal (Neg SHAP/Risk Decrease)
 const getShapColor = (shapValue) => {
-  return shapValue >= 0 ? '#b91c1c' : '#0f766e';
+  return shapValue >= 0 ? '#d71500' : '#22c55e';
 };
 
 // Clean JNJ-style Tooltip
@@ -145,7 +145,7 @@ const ShapBarChart = ({ data }) => {
           <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '4px', border: '1px solid #e2e8f0' }} />
           <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
             {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill="#b91c1c" /> 
+              <Cell key={`cell-${index}`} fill="#d71500" /> 
             ))}
           </Bar>
         </BarChart>
