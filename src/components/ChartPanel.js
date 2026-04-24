@@ -243,16 +243,16 @@ const SPECIALTY_COLORS = [
         return <div className="no-data">No data available</div>;
       }
 
-      const maxExposure = Math.max(...rawData.map((d) => Number(d.total_exposure || 0)), 1);
+      const maxExposure = Math.max(...rawData.map((d) => Number(d.total_exposure_raw || 0)), 1);
       const maxHospitalCount = Math.max(...rawData.map((d) => Number(d.hospital_count || 0)), 1);
       const maxAvgRisk = Math.max(...rawData.map((d) => Number(d.avg_risk_score || 0)), 1);
 
       const barData = rawData.map((item) => ({
         tier: item.tier,
-        exposureBar: (Number(item.total_exposure || 0) / maxExposure) * 100,
+        exposureBar: (Number(item.total_exposure_raw || 0) / maxExposure) * 100,
         hospitalBar: (Number(item.hospital_count || 0) / maxHospitalCount) * 100,
         riskBar: (Number(item.avg_risk_score || 0) / maxAvgRisk) * 100,
-        total_exposure: Number(item.total_exposure || 0),
+        total_exposure_raw: Number(item.total_exposure_raw || 0),
         hospital_count: Number(item.hospital_count || 0),
         avg_risk_score: Number(item.avg_risk_score || 0)
       }));
