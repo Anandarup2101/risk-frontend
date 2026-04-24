@@ -280,7 +280,7 @@ const SPECIALTY_COLORS = [
                   return (
                     <div className="custom-tooltip">
                       <p style={{ fontWeight: 'bold', marginBottom: '6px' }}>{label}</p>
-                      <p style={{ margin: 0 }}>Total Exposure: {formatCurrency(data.total_exposure)}</p>
+                      <p style={{ margin: 0 }}>Total Exposure: {formatCurrency(data.total_exposure_raw)}</p>
                       <p style={{ margin: 0 }}>Hospital Count: {data.hospital_count}</p>
                       <p style={{ margin: 0 }}>
                         Avg Risk Score: {data.avg_risk_score.toFixed(2)}
