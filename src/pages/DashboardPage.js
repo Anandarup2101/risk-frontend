@@ -14,8 +14,32 @@ function DashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [overview, setOverview] = useState('');
+  const [overviewLoading, setOverviewLoading] = useState(false);
+  const [overviewError, setOverviewError] = useState('');
+  const [showOverviewModal, setShowOverviewModal] = useState(false);
+
+  const RefreshIcon = ({ size = 24, color = "currentColor", className = "" }) => (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
+    </svg>
+  );
+
   const fetchDashboardData = useCallback(async (currentFilters) => {
     setLoading(true);
+    setOverview('');
+    setOverviewError('');
+
     try {
       const payload = {};
 
@@ -80,6 +104,29 @@ function DashboardPage() {
     });
   }, [handleApplyFilters]);
 
+  const handleGenerateOverview = async () => {
+    if (!data) return;
+
+    setShowOverviewModal(true);
+    setOverviewLoading(true);
+    setOverview('');
+    setOverviewError('');
+
+    try {
+      const response = await api.post('/llm/dashboard-overview', data);
+      setOverview(response.data?.overview || 'No overview generated.');
+    } catch (error) {
+      console.error('Failed to generate overview', error);
+      setOverviewError('Unable to generate dashboard overview.');
+    } finally {
+      setOverviewLoading(false);
+    }
+  };
+
+  const handleCloseOverviewModal = () => {
+    setShowOverviewModal(false);
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = '/login';
@@ -88,6 +135,7 @@ function DashboardPage() {
   return (
     <div className="dashboard-container">
       <Header onLogout={handleLogout} />
+
       <main className="main-content">
         <aside className="unified-sidebar">
           <div className="sidebar-section filters-section">
@@ -125,6 +173,23 @@ function DashboardPage() {
             <div className="loading-state">Loading data...</div>
           ) : (
             <>
+              <div className="dashboard-overview-card">
+                <div className="dashboard-overview-content">
+                  <div className="dashboard-overview-label">Dashboard Overview</div>
+                  <div className="dashboard-overview-title">
+                    Generate Business Interpretation of Current Filtered view
+                  </div>
+                </div>
+
+                <button
+                  className="dashboard-overview-btn"
+                  onClick={handleGenerateOverview}
+                  disabled={!data || overviewLoading}
+                >
+                  {overviewLoading ? 'Generating...' : 'Generate Overview'}
+                </button>
+              </div>
+
               <KpiCards cards={data?.cards} />
               <RiskTable tableData={data?.table} />
               <ChartPanel chartData={data?.charts} />
@@ -132,6 +197,43 @@ function DashboardPage() {
           )}
         </section>
       </main>
+
+      {showOverviewModal && (
+        <div className="overview-modal-backdrop" onClick={handleCloseOverviewModal}>
+          <div className="overview-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="overview-modal-header">
+              <div>
+                <div className="overview-modal-label">Dashboard Overview</div>
+                <h3>Business Risk Interpretation</h3>
+              </div>
+
+              <button className="overview-modal-close" onClick={handleCloseOverviewModal}>
+                ×
+              </button>
+            </div>
+
+            <div className="overview-modal-body">
+              {overviewLoading ? (
+                <div className="loading-container">
+                  <RefreshIcon size={32} className="spin" color="#d71500" />
+                  <div className="loading-text">Generating insights...</div>
+                </div>
+              ) : overviewError ? (
+                <div className="overview-error">{overviewError}</div>
+              ) : (
+                <div className="overview-text">
+                  {overview
+                    ?.split('\n')
+                    .filter(p => p.trim() !== '')
+                    .map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

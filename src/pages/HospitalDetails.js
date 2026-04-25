@@ -23,6 +23,22 @@ const ArrowLeft = ({ size = 24, color = 'currentColor' }) => (
   </svg>
 );
 
+const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
+  </svg>
+);
+
 const TrendingUp = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -51,6 +67,17 @@ const Stethoscope = ({ size = 24, color = 'currentColor' }) => (
     <circle cx="20" cy="10" r="2"></circle>
   </svg>
 );
+
+// ---------------- HELPERS ----------------
+
+const renderParagraphs = (text) => {
+  if (!text) return <p>No explanation available.</p>;
+
+  return text
+    .split('\n')
+    .filter((para) => para.trim() !== '')
+    .map((para, index) => <p key={index}>{para}</p>);
+};
 
 // ---------------- TOOLTIP ----------------
 
@@ -173,6 +200,11 @@ const HospitalDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [waterfallView, setWaterfallView] = useState('chart');
+  const [waterfallExplanation, setWaterfallExplanation] = useState('');
+  const [waterfallExplanationLoading, setWaterfallExplanationLoading] = useState(false);
+  const [waterfallExplanationError, setWaterfallExplanationError] = useState('');
+
   useEffect(() => {
     if (!hospitalName) {
       navigate('/');
@@ -202,6 +234,31 @@ const HospitalDetails = () => {
 
     fetchDetails();
   }, [hospitalName, navigate]);
+
+  const handleWaterfallViewChange = async (view) => {
+    setWaterfallView(view);
+
+    if (view !== 'explainability') return;
+    if (waterfallExplanation || waterfallExplanationLoading) return;
+    if (!data) return;
+
+    setWaterfallExplanationLoading(true);
+    setWaterfallExplanationError('');
+
+    try {
+      const response = await api.post('/llm/waterfall-explanation', {
+        hospital: data.hospital,
+        waterfall: data.waterfall
+      });
+
+      setWaterfallExplanation(response.data?.explanation || 'No explanation generated.');
+    } catch (err) {
+      console.error('Failed to generate waterfall explanation', err);
+      setWaterfallExplanationError('Unable to generate feature contribution explanation.');
+    } finally {
+      setWaterfallExplanationLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -312,33 +369,66 @@ const HospitalDetails = () => {
 
         <div className="content-grid">
           <div className="card waterfall-card">
-            <div className="card-header">
-              <h3>Feature Contribution</h3>
-              <p className="subtitle">Top factors increasing or decreasing risk score</p>
+            <div className="card-header card-header-with-toggle">
+              <div>
+                <h3>Feature Contribution</h3>
+                <p className="subtitle">Top factors increasing or decreasing risk score</p>
+              </div>
+
+              <div className="chart-toggle">
+                <button
+                  className={waterfallView === 'chart' ? 'active' : ''}
+                  onClick={() => handleWaterfallViewChange('chart')}
+                >
+                  Chart
+                </button>
+                <button
+                  className={waterfallView === 'explainability' ? 'active' : ''}
+                  onClick={() => handleWaterfallViewChange('explainability')}
+                >
+                  Explainability
+                </button>
+              </div>
             </div>
-            <div className="waterfall-container">
-              {(waterfall.features || []).map((feat, idx) => (
-                <div key={idx} className="waterfall-row">
-                  <div className="feature-label">{feat.feature}</div>
-                  <div className="bar-area">
-                    {feat.direction === 'decrease' && (
-                      <div
-                        className="bar-bar decrease"
-                        style={{ width: `${Math.min(Math.abs(Number(feat.shap_value || 0)) * 100, 100)}%` }}
-                      ></div>
-                    )}
-                    <div className="center-line"></div>
-                    {feat.direction === 'increase' && (
-                      <div
-                        className="bar-bar increase"
-                        style={{ width: `${Math.min(Math.abs(Number(feat.shap_value || 0)) * 100, 100)}%` }}
-                      ></div>
-                    )}
+
+            {waterfallView === 'chart' ? (
+              <div className="waterfall-container">
+                {(waterfall.features || []).map((feat, idx) => (
+                  <div key={idx} className="waterfall-row">
+                    <div className="feature-label">{feat.feature}</div>
+                    <div className="bar-area">
+                      {feat.direction === 'decrease' && (
+                        <div
+                          className="bar-bar decrease"
+                          style={{ width: `${Math.min(Math.abs(Number(feat.shap_value || 0)) * 100, 100)}%` }}
+                        ></div>
+                      )}
+                      <div className="center-line"></div>
+                      {feat.direction === 'increase' && (
+                        <div
+                          className="bar-bar increase"
+                          style={{ width: `${Math.min(Math.abs(Number(feat.shap_value || 0)) * 100, 100)}%` }}
+                        ></div>
+                      )}
+                    </div>
+                    <div className="value-label">{Number(feat.shap_value || 0).toFixed(3)}</div>
                   </div>
-                  <div className="value-label">{Number(feat.shap_value || 0).toFixed(3)}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="waterfall-explanation-panel">
+                {waterfallExplanationLoading ? (
+                  <div className="loading-container">
+                    <RefreshIcon size={28} className="spin" color="#d71500" />
+                    <span className="loading-text">Generating explanation...</span>
+                  </div>
+                ) : waterfallExplanationError ? (
+                  <div className="inline-error">{waterfallExplanationError}</div>
+                ) : (
+                  renderParagraphs(waterfallExplanation)
+                )}
+              </div>
+            )}
           </div>
 
           <div className="card tree-vote-card">
@@ -346,11 +436,13 @@ const HospitalDetails = () => {
               <h3>Model Consensus</h3>
               <p className="subtitle">Risk Signal Breakdown</p>
             </div>
+
             <div className="vote-visual">
               <div className="vote-percent">
                 {Number(tree_vote.risk_percent || 0)}%
                 <span className="vote-sub">Risky</span>
               </div>
+
               <div className="vote-bar-container">
                 <div
                   className="vote-segment risky"
@@ -361,14 +453,15 @@ const HospitalDetails = () => {
                   style={{ width: `${100 - Number(tree_vote.risk_percent || 0)}%` }}
                 ></div>
               </div>
+
               <div className="vote-stats">
                 <div className="stat-item">
                   <span className="count">{Number(tree_vote.yes_votes || 0)}</span>
-                  <span className="label">Warning Indicators <p>-  High Risk Signals</p></span>
+                  <span className="label">Warning Indicators <p>- High Risk Signals</p></span>
                 </div>
                 <div className="stat-item">
                   <span className="count">{Number(tree_vote.no_votes || 0)}</span>
-                  <span className="label">Confidence in Stability <p>   - Low Risk Signals</p></span>
+                  <span className="label">Confidence in Stability <p>- Low Risk Signals</p></span>
                 </div>
               </div>
             </div>

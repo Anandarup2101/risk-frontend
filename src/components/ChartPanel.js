@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LabelList } from 'recharts';
 import {
   ScatterChart,
   Scatter,
@@ -40,18 +41,18 @@ function ChartPanel({ chartData }) {
   //   '#8B5CF6'
   // ];
 
-const SPECIALTY_COLORS = [
-  '#5C0011', // deep maroon
-  '#8B0000', // dark red
-  '#B91C1C', // strong red
-  '#D32F2F', // primary red
-  '#F97316', // orange
-  '#FB8C00', // amber orange
-  '#F59E0B', // warm amber
-  '#FACC15', // yellow
-  '#E6E8EB', // light grey
-  '#9CA3AF'  // medium grey
-];
+  const SPECIALTY_COLORS = [
+    '#5C0011', // deep maroon
+    '#8B0000', // dark red
+    '#B91C1C', // strong red
+    '#D32F2F', // primary red
+    '#F97316', // orange
+    '#FB8C00', // amber orange
+    '#F59E0B', // warm amber
+    '#FACC15', // yellow
+    '#E6E8EB', // light grey
+    '#9CA3AF'  // medium grey
+  ];
 
   const getDonutColor = (name) => {
     if (name === 'Low Risk') return '#22c55e';
@@ -299,21 +300,78 @@ const SPECIALTY_COLORS = [
               name="Total Exposure"
               fill="#5C0011"
               radius={[6, 6, 0, 0]}
-            />
+            >
+              <LabelList
+                position="top"
+                content={(props) => {
+                  const { x, y, width } = props;
+                  return (
+                    <text
+                      x={x + width / 2}
+                      y={y - 6}
+                      textAnchor="middle"
+                      fontSize={11}
+                      fill="#5c0011"
+                      fontWeight={600}
+                    >
+                      Exposure
+                    </text>
+                  );
+                }}
+              />
+            </Bar>
 
             <Bar
               dataKey="hospitalBar"
               name="Hospital Count"
               fill="#D32F2F"
               radius={[6, 6, 0, 0]}
-            />
+            >
+              <LabelList
+                position="top"
+                content={(props) => {
+                  const { x, y, width } = props;
+                  return (
+                    <text
+                      x={x + width / 2}
+                      y={y - 6}
+                      textAnchor="middle"
+                      fontSize={11}
+                      fill="#991b1b"
+                      fontWeight={600}
+                    >
+                      Hospitals
+                    </text>
+                  );
+                }}
+              />
+            </Bar>
 
             <Bar
               dataKey="riskBar"
               name="Avg Risk Score"
               fill="#F28B82"
               radius={[6, 6, 0, 0]}
-            />
+            >
+              <LabelList
+                position="top"
+                content={(props) => {
+                  const { x, y, width } = props;
+                  return (
+                    <text
+                      x={x + width / 2}
+                      y={y - 6}
+                      textAnchor="middle"
+                      fontSize={11}
+                      fill="#7f1d1d"
+                      fontWeight={600}
+                    >
+                      Risk Score
+                    </text>
+                  );
+                }}
+              />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       );

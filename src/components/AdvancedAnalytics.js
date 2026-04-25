@@ -61,7 +61,7 @@ const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
 
 /* ---------------- COLORS ---------------- */
 
-const CLUSTER_COLORS = ['#5C0011', '#D71500', '#F97316', '#FACC15', '#9CA3AF'];
+const CLUSTER_COLORS = ['#D71500', '#FACC15', '#F97316','#5C0011', '#9CA3AF'];
 
 const getClusterColor = (id) => CLUSTER_COLORS[id % CLUSTER_COLORS.length];
 
