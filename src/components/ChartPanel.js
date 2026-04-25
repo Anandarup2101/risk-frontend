@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { LabelList } from 'recharts';
 import {
   ScatterChart,
   Scatter,
@@ -13,8 +12,10 @@ import {
   Pie,
   Cell,
   Legend,
-  BarChart,
-  Bar
+  Bar,
+  Line,
+  ComposedChart,
+  LabelList
 } from 'recharts';
 import './ChartPanel.css';
 
@@ -28,30 +29,17 @@ function ChartPanel({ chartData }) {
     Critical: '#5c0011'
   };
 
-  // const SPECIALTY_COLORS = [
-  //   '#D71500',
-  //   '#5C0011',
-  //   '#F28B82',
-  //   '#D46B08',
-  //   '#F59E0B',
-  //   '#1A2E44',
-  //   '#64748B',
-  //   '#22C55E',
-  //   '#0EA5E9',
-  //   '#8B5CF6'
-  // ];
-
   const SPECIALTY_COLORS = [
-    '#5C0011', // deep maroon
-    '#8B0000', // dark red
-    '#B91C1C', // strong red
-    '#D32F2F', // primary red
-    '#F97316', // orange
-    '#FB8C00', // amber orange
-    '#F59E0B', // warm amber
-    '#FACC15', // yellow
-    '#E6E8EB', // light grey
-    '#9CA3AF'  // medium grey
+    '#5C0011',
+    '#8B0000',
+    '#B91C1C',
+    '#D32F2F',
+    '#F97316',
+    '#FB8C00',
+    '#F59E0B',
+    '#FACC15',
+    '#E6E8EB',
+    '#9CA3AF'
   ];
 
   const getDonutColor = (name) => {
@@ -68,16 +56,19 @@ function ChartPanel({ chartData }) {
 
   const formatCurrency = (value) => {
     if (value === null || value === undefined) return '0';
+
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 0
     }).format(value);
   };
 
   const buildPieData = (donutPayload) => {
-    return (donutPayload?.labels || []).map((label, i) => ({
-      name: label,
-      value: Number(donutPayload.values?.[i] || 0)
-    })).filter((item) => item.value > 0);
+    return (donutPayload?.labels || [])
+      .map((label, i) => ({
+        name: label,
+        value: Number(donutPayload.values?.[i] || 0)
+      }))
+      .filter((item) => item.value > 0);
   };
 
   const renderChart = () => {
@@ -86,7 +77,10 @@ function ChartPanel({ chartData }) {
     if (activeChart === 'bubble') {
       const coloredBubbleData = (chartData.bubble || []).map((item) => ({
         ...item,
-        fill: item.risk === 1 ? (RISK_COLORS[item.risk_tier] || '#D71500') : '#22c55e'
+        fill:
+          item.risk === 1
+            ? RISK_COLORS[item.risk_tier] || '#D71500'
+            : '#22c55e'
       }));
 
       if (!coloredBubbleData.length) {
@@ -97,18 +91,21 @@ function ChartPanel({ chartData }) {
         <ResponsiveContainer width="100%" height={300}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6E8EB" />
+
             <XAxis
               dataKey="x"
               name="DSO 30d"
               type="number"
               label={{ value: 'DSO 30d', position: 'insideBottom', offset: -5 }}
             />
+
             <YAxis
               dataKey="y"
               name="Credit Used"
               type="number"
               label={{ value: 'Credit Used', angle: -90, position: 'insideLeft' }}
             />
+
             <ZAxis dataKey="size" range={[50, 400]} name="Total Payments" />
 
             <Tooltip
@@ -116,15 +113,17 @@ function ChartPanel({ chartData }) {
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
+
                   return (
                     <div className="custom-tooltip">
-                      <p style={{ fontWeight: 'bold', marginBottom: '4px' }}>{data.label}</p>
-                      <p style={{ margin: 0 }}>DSO: {data.x}</p>
-                      <p style={{ margin: 0 }}>Credit: {data.y}</p>
-                      <p style={{ margin: 0 }}>Tier: {data.risk_tier || 'Unknown'}</p>
+                      <p className="tooltip-title">{data.label}</p>
+                      <p>DSO: {data.x}</p>
+                      <p>Credit: {data.y}</p>
+                      <p>Tier: {data.risk_tier || 'Unknown'}</p>
                     </div>
                   );
                 }
+
                 return null;
               }}
             />
@@ -244,51 +243,79 @@ function ChartPanel({ chartData }) {
         return <div className="no-data">No data available</div>;
       }
 
-      const maxExposure = Math.max(...rawData.map((d) => Number(d.total_exposure_raw || 0)), 1);
-      const maxHospitalCount = Math.max(...rawData.map((d) => Number(d.hospital_count || 0)), 1);
-      const maxAvgRisk = Math.max(...rawData.map((d) => Number(d.avg_risk_score || 0)), 1);
+      const maxExposure = Math.max(
+        ...rawData.map((d) => Number(d.total_exposure_raw || 0)),
+        1
+      );
 
-      const barData = rawData.map((item) => ({
+      const maxHospitalCount = Math.max(
+        ...rawData.map((d) => Number(d.hospital_count || 0)),
+        1
+      );
+
+      const composedData = rawData.map((item) => ({
         tier: item.tier,
+
         exposureBar: (Number(item.total_exposure_raw || 0) / maxExposure) * 100,
         hospitalBar: (Number(item.hospital_count || 0) / maxHospitalCount) * 100,
-        riskBar: (Number(item.avg_risk_score || 0) / maxAvgRisk) * 100,
+
         total_exposure_raw: Number(item.total_exposure_raw || 0),
         hospital_count: Number(item.hospital_count || 0),
         avg_risk_score: Number(item.avg_risk_score || 0)
       }));
 
       return (
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={barData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }} barGap={10}>
+        <ResponsiveContainer width="100%" height={340}>
+          <ComposedChart
+            data={composedData}
+            margin={{ top: 34, right: 30, bottom: 24, left: 20 }}
+            barGap={10}
+          >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6E8EB" />
 
             <XAxis
               dataKey="tier"
-              label={{ value: 'Risk Tier', position: 'insideBottom', offset: -5 }}
+              label={{ value: 'Risk Tier', position: 'insideBottom', offset: -8 }}
             />
 
             <YAxis
-              domain={[0, 110]}
+              yAxisId="left"
+              domain={[0, 115]}
               tickFormatter={(value) => `${value}%`}
-              label={{ value: 'Relative Scale', angle: -90, position: 'insideLeft' }}
+              label={{
+                value: 'Relative Business Scale',
+                angle: -90,
+                position: 'insideLeft'
+              }}
+            />
+
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[0, 100]}
+              tickFormatter={(value) => `${value}`}
+              label={{
+                value: 'Avg Risk Score',
+                angle: 90,
+                position: 'insideRight'
+              }}
             />
 
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
+
                   return (
                     <div className="custom-tooltip">
-                      <p style={{ fontWeight: 'bold', marginBottom: '6px' }}>{label}</p>
-                      <p style={{ margin: 0 }}>Total Exposure: {formatCurrency(data.total_exposure_raw)}</p>
-                      <p style={{ margin: 0 }}>Hospital Count: {data.hospital_count}</p>
-                      <p style={{ margin: 0 }}>
-                        Avg Risk Score: {data.avg_risk_score.toFixed(2)}
-                      </p>
+                      <p className="tooltip-title">{label}</p>
+                      <p>Total Exposure: {formatCurrency(data.total_exposure_raw)}</p>
+                      <p>Hospital Count: {data.hospital_count}</p>
+                      <p>Avg Risk Score: {data.avg_risk_score.toFixed(2)}</p>
                     </div>
                   );
                 }
+
                 return null;
               }}
             />
@@ -296,23 +323,25 @@ function ChartPanel({ chartData }) {
             <Legend />
 
             <Bar
+              yAxisId="left"
               dataKey="exposureBar"
               name="Total Exposure"
               fill="#5C0011"
-              radius={[6, 6, 0, 0]}
+              radius={[7, 7, 0, 0]}
             >
               <LabelList
                 position="top"
                 content={(props) => {
                   const { x, y, width } = props;
+
                   return (
                     <text
                       x={x + width / 2}
-                      y={y - 6}
+                      y={y - 8}
                       textAnchor="middle"
                       fontSize={11}
-                      fill="#5c0011"
-                      fontWeight={600}
+                      fill="#5C0011"
+                      fontWeight={700}
                     >
                       Exposure
                     </text>
@@ -322,23 +351,25 @@ function ChartPanel({ chartData }) {
             </Bar>
 
             <Bar
+              yAxisId="left"
               dataKey="hospitalBar"
               name="Hospital Count"
               fill="#D32F2F"
-              radius={[6, 6, 0, 0]}
+              radius={[7, 7, 0, 0]}
             >
               <LabelList
                 position="top"
                 content={(props) => {
                   const { x, y, width } = props;
+
                   return (
                     <text
                       x={x + width / 2}
-                      y={y - 6}
+                      y={y - 8}
                       textAnchor="middle"
                       fontSize={11}
-                      fill="#991b1b"
-                      fontWeight={600}
+                      fill="#991B1B"
+                      fontWeight={700}
                     >
                       Hospitals
                     </text>
@@ -347,32 +378,28 @@ function ChartPanel({ chartData }) {
               />
             </Bar>
 
-            <Bar
-              dataKey="riskBar"
+            <Line
+              yAxisId="right"
+              type="monotone"
+              dataKey="avg_risk_score"
               name="Avg Risk Score"
-              fill="#F28B82"
-              radius={[6, 6, 0, 0]}
+              stroke="#F28B82"
+              strokeWidth={3}
+              dot={{ r: 5, stroke: '#F28B82', fill: '#ffffff' }}
+              activeDot={{ r: 7, stroke: '#F28B82', fill: '#ffffff' }}
             >
               <LabelList
+                dataKey="avg_risk_score"
                 position="top"
-                content={(props) => {
-                  const { x, y, width } = props;
-                  return (
-                    <text
-                      x={x + width / 2}
-                      y={y - 6}
-                      textAnchor="middle"
-                      fontSize={11}
-                      fill="#7f1d1d"
-                      fontWeight={600}
-                    >
-                      Risk Score
-                    </text>
-                  );
+                formatter={(val) => `Risk: ${val.toFixed(1)}`}
+                style={{
+                  fontSize: 11,
+                  fill: '#F28B82',
+                  fontWeight: 700
                 }}
               />
-            </Bar>
-          </BarChart>
+            </Line>
+          </ComposedChart>
         </ResponsiveContainer>
       );
     }
@@ -384,6 +411,7 @@ function ChartPanel({ chartData }) {
     <div className="chart-panel">
       <div className="chart-header">
         <h3>Risk Analysis Overview</h3>
+
         <div className="chart-toggles">
           <button
             className={activeChart === 'bubble' ? 'toggle-btn active' : 'toggle-btn'}
@@ -415,9 +443,7 @@ function ChartPanel({ chartData }) {
         </div>
       </div>
 
-      <div className="chart-area">
-        {renderChart()}
-      </div>
+      <div className="chart-area">{renderChart()}</div>
     </div>
   );
 }

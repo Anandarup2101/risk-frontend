@@ -214,3 +214,23 @@
     height: 280px;
   }
 }
+
+.custom-tooltip {
+  background: #ffffff;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.custom-tooltip p {
+  margin: 3px 0;
+}
+
+.custom-tooltip .tooltip-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
