@@ -46,24 +46,32 @@ const formatFullCurrency = (value) => {
 function KpiCards({ cards }) {
   if (!cards) return null;
 
+  const totalHospitals = Number(cards.total_hospitals ?? 0);
+  const totalAtRisk = Number(cards.total_at_risk ?? 0);
+
+  const highRiskPercent =
+    totalHospitals > 0
+      ? ((totalAtRisk / totalHospitals) * 100).toFixed(1)
+      : '0.0';
+
   const items = [
     {
       label: 'Total Hospitals',
-      value: cards.total_hospitals ?? 0,
+      value: totalHospitals,
       tooltipTitle: 'Total Hospitals',
-      tooltipValue: `${cards.total_hospitals ?? 0} Hospitals in Dataset`,
+      tooltipValue: `${totalHospitals} hospitals in dataset`,
       icon: <HospitalIcon />
     },
     {
       label: 'High Risk Count',
-      value: cards.total_at_risk ?? 0,
+      value: totalAtRisk,
       tooltipTitle: 'High Risk Count',
-      tooltipValue: `${cards.total_at_risk ?? 0} Hospitals Flagged as Risky`,
+      tooltipValue: `${highRiskPercent}% of hospitals flagged as risky (${totalAtRisk}/${totalHospitals})`,
       icon: <RiskIcon />
     },
     {
       label: 'Total Exposure',
-      value: `$${cards.total_exposure || '0'}`,
+      value: cards.total_exposure ? `$${cards.total_exposure}` : '$0',
       tooltipTitle: 'Total Exposure',
       tooltipValue: formatFullCurrency(cards.total_exposure_raw),
       icon: <MoneyIcon />
@@ -72,7 +80,7 @@ function KpiCards({ cards }) {
       label: '% Exposure At Risk',
       value: `${cards.exposure_at_risk ?? 0}%`,
       tooltipTitle: 'Exposure At Risk',
-      tooltipValue: `${cards.exposure_at_risk ?? 0}% of Exposure is at Risk`,
+      tooltipValue: `${cards.exposure_at_risk ?? 0}% of total exposure is at risk`,
       icon: <PercentIcon />
     }
   ];
@@ -81,13 +89,11 @@ function KpiCards({ cards }) {
     <div className="kpi-container">
       {items.map((item, index) => (
         <div key={index} className="kpi-card">
-          
           <div className="kpi-content">
             <div className="kpi-label">{item.label}</div>
             <div className="kpi-value">{item.value}</div>
           </div>
 
-          {/* ICON + TOOLTIP */}
           <div className="kpi-icon-wrap">
             <div className="kpi-icon">
               {item.icon}
@@ -98,7 +104,6 @@ function KpiCards({ cards }) {
               <div className="tooltip-value">{item.tooltipValue}</div>
             </div>
           </div>
-
         </div>
       ))}
     </div>
