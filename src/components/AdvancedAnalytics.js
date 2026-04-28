@@ -61,9 +61,10 @@ const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
 
 /* ---------------- COLORS ---------------- */
 
-const CLUSTER_COLORS = ['#D71500', '#FACC15', '#F97316', '#5C0011', '#9CA3AF'];
+const CLUSTER_COLORS =  [ '#D71500','#FACC15', '#F97316', '#5C0011', '#9CA3AF'];
 
-const getClusterColor = (id = 0) => CLUSTER_COLORS[Math.abs(Number(id || 0)) % CLUSTER_COLORS.length];
+const getClusterColor = (id = 0) =>
+  CLUSTER_COLORS[Math.abs(Number(id || 0)) % CLUSTER_COLORS.length];
 
 const getRiskColor = (risk) => {
   const value = Number(risk || 0);
@@ -353,28 +354,28 @@ const ClusterScatterChart = ({ data }) => {
       <ZoneBadge
         title="Stable Zone"
         meaning="Low payment delay and controlled credit usage. These hospitals are financially stable."
-        className="top-left-zone"
+        className="stable-zone tooltip-bottom-right"
         style={{ position: 'absolute', top: 70, left: 60 }}
       />
 
       <ZoneBadge
         title="High Risk Zone"
         meaning="High payment delay and high credit usage. These hospitals need immediate attention."
-        className="danger top-right-zone"
+        className="danger high-risk-zone tooltip-bottom-left"
         style={{ position: 'absolute', top: 70, right: 40 }}
       />
 
       <ZoneBadge
         title="Low Credit / Low Risk"
         meaning="Low credit usage and low payment delay. Exposure risk is currently limited."
-        className="bottom-left-zone"
+        className="low-credit-zone tooltip-top-right"
         style={{ position: 'absolute', bottom: 52, left: 60 }}
       />
 
       <ZoneBadge
         title="Watchlist"
         meaning="Delay or exposure signals are emerging. Monitor these hospitals closely."
-        className="warning bottom-right-zone"
+        className="warning watchlist-zone tooltip-top-left"
         style={{ position: 'absolute', bottom: 52, right: 40 }}
       />
     </div>
@@ -564,7 +565,7 @@ const AdvancedAnalytics = ({ filters }) => {
               </div>
             </div>
 
-            <div className="analytics-modal-body">
+            <div className="analytics-modal-body analytics-modal-body-cluster">
               {clusterState.loading ? (
                 <div className="analytics-loading-container">
                   <RefreshIcon size={32} className="analytics-spin" color="#D71500" />

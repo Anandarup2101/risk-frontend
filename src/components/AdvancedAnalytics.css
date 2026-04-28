@@ -123,6 +123,10 @@
   background: var(--bg-light);
 }
 
+.analytics-modal-body-cluster {
+  overflow: visible;
+}
+
 .analytics-chart-card {
   height: 100%;
   width: 100%;
@@ -135,6 +139,11 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.analytics-cluster-chart-card {
+  overflow: visible;
+  z-index: 1;
 }
 
 .analytics-chart-title {
@@ -179,7 +188,7 @@
   padding: 6px 10px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   cursor: help;
-  z-index: 20;
+  z-index: 30;
   white-space: nowrap;
 }
 
@@ -198,7 +207,7 @@
 .analytics-zone-tooltip {
   display: none;
   position: absolute;
-  width: 240px;
+  width: 250px;
   background: var(--bg-white);
   color: #334155;
   padding: 10px 12px;
@@ -210,10 +219,39 @@
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
   white-space: normal;
   z-index: 9999;
+  pointer-events: none;
+}
+
+.analytics-zone-badge:hover {
+  z-index: 9998;
 }
 
 .analytics-zone-badge:hover .analytics-zone-tooltip {
   display: block;
+}
+
+/* Stable Zone: tooltip bottom-right */
+.tooltip-bottom-right .analytics-zone-tooltip {
+  top: calc(100% + 10px);
+  left: 0;
+}
+
+/* Low Credit / Low Risk: tooltip top-right */
+.tooltip-top-right .analytics-zone-tooltip {
+  bottom: calc(100% + 10px);
+  left: 0;
+}
+
+/* Watchlist: tooltip top-left */
+.tooltip-top-left .analytics-zone-tooltip {
+  bottom: calc(100% + 10px);
+  right: 0;
+}
+
+/* High Risk Zone: tooltip bottom-left */
+.tooltip-bottom-left .analytics-zone-tooltip {
+  top: calc(100% + 10px);
+  right: 0;
 }
 
 .analytics-custom-tooltip {
