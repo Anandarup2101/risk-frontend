@@ -7,33 +7,57 @@ import KpiCards from '../components/KpiCards';
 import RiskTable from '../components/RiskTable';
 import ChartPanel from '../components/ChartPanel';
 import api from '../api';
+import ChatbotAssistant from '../components/ChatbotAssistant';
 import './DashboardPage.css';
+
+const RiskAnalysisIcon = ({ size = 18, color = 'currentColor' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="6" y1="20" x2="6" y2="10"></line>
+    <line x1="12" y1="20" x2="12" y2="4"></line>
+    <line x1="18" y1="20" x2="18" y2="14"></line>
+  </svg>
+);
+
+const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
+  </svg>
+);
 
 function DashboardPage() {
   const [filters, setFilters] = useState({});
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [openSidebarSection, setOpenSidebarSection] = useState('filters');
+
   const [overview, setOverview] = useState('');
   const [overviewLoading, setOverviewLoading] = useState(false);
   const [overviewError, setOverviewError] = useState('');
   const [showOverviewModal, setShowOverviewModal] = useState(false);
 
-  const RefreshIcon = ({ size = 24, color = "currentColor", className = "" }) => (
-    <svg
-      className={className}
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
-    </svg>
-  );
+  const [showRiskModal, setShowRiskModal] = useState(false);
+
+  const currentYear = new Date().getFullYear();
 
   const fetchDashboardData = useCallback(async (currentFilters) => {
     setLoading(true);
@@ -45,6 +69,7 @@ function DashboardPage() {
 
       if (currentFilters.location) {
         const { min_lat, max_lat, min_lon, max_lon } = currentFilters.location;
+
         if (min_lat && max_lat && min_lon && max_lon) {
           payload.location = {
             min_lat: parseFloat(min_lat),
@@ -55,16 +80,17 @@ function DashboardPage() {
         }
       }
 
-      if (currentFilters.specialty && currentFilters.specialty.length > 0) {
+      if (currentFilters.specialty?.length > 0) {
         payload.specialty = currentFilters.specialty;
       }
 
-      if (currentFilters.risk_tier && currentFilters.risk_tier.length > 0) {
+      if (currentFilters.risk_tier?.length > 0) {
         payload.risk_tier = currentFilters.risk_tier;
       }
 
       if (currentFilters.exposure_range) {
         const { min, max } = currentFilters.exposure_range;
+
         if (min && max) {
           payload.exposure_range = {
             min: parseFloat(min),
@@ -77,15 +103,19 @@ function DashboardPage() {
       setData(response.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
+      setData(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const handleApplyFilters = useCallback(async (newFilters) => {
-    setFilters(newFilters);
-    await fetchDashboardData(newFilters);
-  }, [fetchDashboardData]);
+  const handleApplyFilters = useCallback(
+    async (newFilters) => {
+      setFilters(newFilters);
+      await fetchDashboardData(newFilters);
+    },
+    [fetchDashboardData]
+  );
 
   useEffect(() => {
     handleApplyFilters({
@@ -105,7 +135,7 @@ function DashboardPage() {
   }, [handleApplyFilters]);
 
   const handleGenerateOverview = async () => {
-    if (!data) return;
+    if (!data || overviewLoading) return;
 
     setShowOverviewModal(true);
     setOverviewLoading(true);
@@ -116,20 +146,19 @@ function DashboardPage() {
       const response = await api.post('/llm/dashboard-overview', data);
       setOverview(response.data?.overview || 'No overview generated.');
     } catch (error) {
-      console.error('Failed to generate overview', error);
-      setOverviewError('Unable to generate dashboard overview.');
+      setOverviewError('Unable to generate overview.');
     } finally {
       setOverviewLoading(false);
     }
   };
 
-  const handleCloseOverviewModal = () => {
-    setShowOverviewModal(false);
-  };
-
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = '/login';
+  };
+
+  const toggleSidebarSection = (section) => {
+    setOpenSidebarSection((prev) => (prev === section ? '' : section));
   };
 
   return (
@@ -138,33 +167,56 @@ function DashboardPage() {
 
       <main className="main-content">
         <aside className="unified-sidebar">
-          <div className="sidebar-section filters-section">
-            <div className="sidebar-section-header">
-              <h3>Dashboard Filters</h3>
-            </div>
-            <SidebarFilters
-              filters={filters}
-              setFilters={setFilters}
-              onApply={handleApplyFilters}
-            />
+          <div className="sidebar-accordion-section">
+            <button
+              className="sidebar-accordion-header"
+              onClick={() => toggleSidebarSection('filters')}
+              type="button"
+            >
+              <span>Dashboard Filters</span>
+              <span className="accordion-symbol">
+                {openSidebarSection === 'filters' ? '−' : '+'}
+              </span>
+            </button>
+
+            {openSidebarSection === 'filters' && (
+              <div className="sidebar-accordion-body">
+                <SidebarFilters filters={filters} onApply={handleApplyFilters} />
+              </div>
+            )}
           </div>
 
-          <div className="sidebar-divider"></div>
+          <div className="sidebar-accordion-section">
+            <button
+              className="sidebar-accordion-header"
+              onClick={() => toggleSidebarSection('analysis')}
+              type="button"
+            >
+              <span>Analysis Tools</span>
+              <span className="accordion-symbol">
+                {openSidebarSection === 'analysis' ? '−' : '+'}
+              </span>
+            </button>
 
-          <div className="sidebar-section shap-section">
-            <div className="sidebar-section-header">
-              <h3>Explainability</h3>
-            </div>
-            <GlobalShapExplainer />
-          </div>
+            {openSidebarSection === 'analysis' && (
+              <div className="sidebar-accordion-body analysis-tools-body">
+                <button
+                  className="shap-action-button"
+                  onClick={() => setShowRiskModal(true)}
+                  disabled={!data}
+                  type="button"
+                >
+                  <div className="shap-icon-wrapper">
+                    <RiskAnalysisIcon />
+                  </div>
+                  <span>Risk Analysis</span>
+                </button>
 
-          <div className="sidebar-divider"></div>
+                <GlobalShapExplainer />
 
-          <div className="sidebar-section analytics-section">
-            <div className="sidebar-section-header">
-              <h3>Advanced Analytics</h3>
-            </div>
-            <AdvancedAnalytics filters={filters} />
+                <AdvancedAnalytics filters={filters} />
+              </div>
+            )}
           </div>
         </aside>
 
@@ -173,62 +225,85 @@ function DashboardPage() {
             <div className="loading-state">Loading data...</div>
           ) : (
             <>
-              <div className="dashboard-overview-card">
-                <div className="dashboard-overview-content">
-                  <div className="dashboard-overview-label">Dashboard Overview</div>
-                  <div className="dashboard-overview-title">
-                    Generate Business Interpretation of Current Filtered view
+              <div className="dashboard-top-row">
+                <div className="dashboard-overview-card">
+                  <div>
+                    <div className="dashboard-overview-label">Dashboard Overview</div>
+                    <div className="dashboard-overview-title">
+                      Generate Business Interpretation
+                    </div>
                   </div>
+
+                  <button
+                    className="dashboard-overview-btn"
+                    onClick={handleGenerateOverview}
+                    type="button"
+                    disabled={!data || overviewLoading}
+                  >
+                    {overviewLoading ? 'Generating...' : 'Generate'}
+                  </button>
                 </div>
 
-                <button
-                  className="dashboard-overview-btn"
-                  onClick={handleGenerateOverview}
-                  disabled={!data || overviewLoading}
-                >
-                  {overviewLoading ? 'Generating...' : 'Generate Overview'}
-                </button>
+                <ChatbotAssistant />
               </div>
 
               <KpiCards cards={data?.cards} />
-              <RiskTable tableData={data?.table} />
-              <ChartPanel chartData={data?.charts} />
+
+              <div className="risk-table-page-wrapper">
+                <RiskTable tableData={data?.table} />
+              </div>
             </>
           )}
         </section>
       </main>
 
+      <footer className="dashboard-footer">
+        © {currentYear} Tata Consultancy Services. All rights reserved.
+      </footer>
+
+      {showRiskModal && (
+        <div className="risk-modal-backdrop" onClick={() => setShowRiskModal(false)}>
+          <div className="risk-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="risk-modal-header">
+              <h3>Risk Analysis</h3>
+              <button onClick={() => setShowRiskModal(false)} type="button">
+                ×
+              </button>
+            </div>
+
+            <div className="risk-modal-body">
+              <ChartPanel chartData={data?.charts} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {showOverviewModal && (
-        <div className="overview-modal-backdrop" onClick={handleCloseOverviewModal}>
+        <div className="overview-modal-backdrop" onClick={() => setShowOverviewModal(false)}>
           <div className="overview-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="overview-modal-header">
-              <div>
-                <div className="overview-modal-label">Dashboard Overview</div>
-                <h3>Business Risk Interpretation</h3>
-              </div>
-
-              <button className="overview-modal-close" onClick={handleCloseOverviewModal}>
+              <h3>Business Overview</h3>
+              <button onClick={() => setShowOverviewModal(false)} type="button">
                 ×
               </button>
             </div>
 
             <div className="overview-modal-body">
-              {overviewLoading ? (
-                <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#d71500" />
-                  <div className="loading-text">Generating insights...</div>
+              {overviewLoading && (
+                <div className="overview-loading-container">
+                  <RefreshIcon size={32} className="dashboard-spin" color="#d71500" />
+                  <span className="overview-loading-text">
+                    Generating business interpretation...
+                  </span>
                 </div>
-              ) : overviewError ? (
-                <div className="overview-error">{overviewError}</div>
-              ) : (
-                <div className="overview-text">
-                  {overview
-                    ?.split('\n')
-                    .filter(p => p.trim() !== '')
-                    .map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                </div>
+              )}
+
+              {!overviewLoading && overviewError && (
+                <div className="overview-error-container">{overviewError}</div>
+              )}
+
+              {!overviewLoading && !overviewError && overview && (
+                <div className="overview-text">{overview}</div>
               )}
             </div>
           </div>

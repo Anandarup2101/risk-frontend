@@ -1,12 +1,13 @@
 .chart-panel {
-  background: #ffffff;
-  border-radius: 20px;
+  background: var(--bg-white);
+  border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   min-height: 430px;
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(15, 23, 42, 0.06);
+  border-top: 4px solid var(--primary-red);
 }
 
 .chart-header {
@@ -22,8 +23,9 @@
   margin: 0;
   font-size: 18px;
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .chart-toggles {
@@ -37,10 +39,10 @@
   padding: 9px 16px;
   border-radius: 999px;
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-white);
   color: var(--text-secondary);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -55,7 +57,7 @@
 
 .toggle-btn.active {
   background: var(--primary-red);
-  color: #ffffff;
+  color: var(--bg-white);
   border-color: var(--primary-red);
   box-shadow: 0 6px 14px rgba(215, 21, 0, 0.18);
 }
@@ -73,81 +75,32 @@
   min-height: 320px;
 }
 
-.chart-area .recharts-default-tooltip {
-  border-radius: 12px !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12) !important;
+.chart-panel-tooltip {
+  background: var(--bg-white);
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 220px;
 }
 
-.chart-area .recharts-tooltip-wrapper {
-  outline: none;
+.chart-panel-tooltip p {
+  margin: 3px 0;
 }
 
-.chart-area .recharts-cartesian-axis-tick-value {
-  fill: #667085;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.chart-area .recharts-label {
-  fill: #475467;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.chart-area .recharts-legend-wrapper {
-  padding-top: 10px;
-}
-
-.chart-area .recharts-legend-item-text {
-  color: var(--text-secondary) !important;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.chart-area .recharts-cartesian-grid line {
-  stroke: #eaecf0;
-}
-
-.chart-area .recharts-pie-sector:focus,
-.chart-area .recharts-sector:focus,
-.chart-area .recharts-bar-rectangle:focus,
-.chart-area .recharts-symbols:focus {
-  outline: none;
-}
-
-.custom-tooltip {
-  background: #ffffff;
-  padding: 10px;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.coming-soon-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 320px;
-  color: var(--text-muted);
-  background: var(--bg-light);
-  border-radius: 16px;
-  border: 1px dashed var(--border-color);
-  text-align: center;
-  padding: 24px;
-}
-
-.coming-soon-container h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+.chart-panel-tooltip .tooltip-title {
+  font-weight: 700;
+  margin-bottom: 6px;
   color: var(--text-primary);
 }
 
-.coming-soon-container p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
+.chart-panel-tooltip .tooltip-muted {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
 }
 
 .no-data {
@@ -160,77 +113,21 @@
   border: 1px dashed var(--border-color);
   border-radius: 16px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-@media (max-width: 900px) {
-  .chart-panel {
-    padding: 20px;
-    min-height: 400px;
-  }
-
-  .chart-header {
-    margin-bottom: 16px;
-  }
-
-  .chart-toggles {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .chart-area {
-    min-height: 300px;
-  }
-
-  .chart-area .recharts-responsive-container {
-    min-height: 300px;
-  }
+.chart-fade {
+  animation: chartFadeIn 0.28s ease-out;
 }
 
-@media (max-width: 640px) {
-  .chart-panel {
-    padding: 16px;
-    border-radius: 16px;
+@keyframes chartFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 
-  .chart-header h3 {
-    font-size: 16px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-
-  .toggle-btn {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .chart-area {
-    min-height: 280px;
-    padding-top: 4px;
-  }
-
-  .chart-area .recharts-responsive-container,
-  .coming-soon-container,
-  .no-data {
-    min-height: 280px;
-    height: 280px;
-  }
-}
-
-.custom-tooltip {
-  background: #ffffff;
-  padding: 12px 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.custom-tooltip p {
-  margin: 3px 0;
-}
-
-.custom-tooltip .tooltip-title {
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text-primary);
 }

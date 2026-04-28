@@ -1,153 +1,124 @@
-/* --- TRIGGER BUTTON (Sidebar) --- */
 .shap-action-button {
   width: 100%;
   padding: 14px 16px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #334155;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s ease;
   text-align: left;
-  margin: 0;
 }
 
-.shap-action-button:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-  background-color: #fcfcfc;
+.shap-action-button:hover:not(:disabled) {
+  border-color: rgba(215, 21, 0, 0.28);
+  background-color: rgba(215, 21, 0, 0.04);
+  color: var(--primary-red);
 }
 
 .shap-icon-wrapper {
   padding: 8px;
-  background-color: #f1f5f9;
-  border-radius: 4px;
-  color: #475569;
+  background-color: rgba(215, 21, 0, 0.08);
+  border-radius: 10px;
+  color: var(--primary-red);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-/* --- MODAL BACKDROP --- */
-.modal-backdrop {
+.shap-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 24px;
 }
 
-/* --- MODAL CONTENT --- */
-.modal-content {
-  background-color: white;
-  border-radius: 8px;
-  border-top: 4px solid #d71500;
-  box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.08);
+.shap-modal-content {
+  background-color: var(--bg-white);
+  border-radius: 20px;
+  border-top: 4px solid var(--primary-red);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
   width: 92%;
   max-width: 1180px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border-color);
 }
 
-/* --- MODAL HEADER --- */
-.modal-header {
-  padding: 24px 32px;
+.shap-modal-header {
+  padding: 22px 24px;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--bg-white);
 }
 
-.modal-title-group {
+.shap-modal-title-group {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.modal-header h2 {
+.shap-modal-header h2 {
   margin: 0;
-  font-size: 20px;
-  color: #0f172a;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-size: 22px;
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
-/* --- MODAL CONTROLS --- */
-.modal-controls {
+.shap-modal-controls {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-icon {
-  background: none;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 6px 12px;
+.shap-btn-icon {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 8px 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #475569;
-  transition: all 0.25s ease;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.btn-icon:hover:not(:disabled) {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-  color: #334155;
-}
-
-.btn-icon:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.btn-close {
-  background: none;
+.shap-btn-close {
+  background: rgba(215, 21, 0, 0.08);
   border: none;
   cursor: pointer;
-  color: #94a3b8;
-  padding: 8px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s ease;
+  color: var(--primary-red);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
 }
 
-.btn-close:hover {
-  background-color: #f1f5f9;
-  color: #475569;
-}
-
-/* --- MODAL BODY --- */
-.modal-body {
-  padding: 32px;
+.shap-modal-body {
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
-  background: #f8fafc;
+  background: var(--bg-light);
 }
 
-/* --- LOADING STATE --- */
-.loading-container {
+.shap-loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -156,71 +127,45 @@
   gap: 16px;
 }
 
-.loading-text {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-/* --- ERROR STATE --- */
-.error-container {
+.shap-error-container {
   padding: 24px;
-  background-color: #fef2f2;
-  border: 1px solid #fee2e2;
-  border-radius: 6px;
-  color: #991b1b;
+  background-color: var(--risk-high-bg);
+  border: 1px solid var(--risk-high-border);
+  border-radius: 12px;
+  color: var(--risk-high);
   text-align: center;
-  margin-top: 20px;
   font-size: 14px;
+  font-weight: 600;
 }
 
-.retry-btn {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background: #991b1b;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-/* --- TOP PLOT TOGGLE --- */
-.plot-toggle-row {
+.shap-plot-toggle-row {
   display: inline-flex;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
   padding: 5px;
   border-radius: 12px;
   gap: 6px;
   width: fit-content;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
-.plot-toggle-row button {
+.shap-plot-toggle-row button,
+.shap-chart-toggle button {
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--text-muted);
   padding: 9px 18px;
   border-radius: 9px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.plot-toggle-row button:hover {
-  color: #334155;
+.shap-plot-toggle-row button.active {
+  background: var(--primary-red);
+  color: var(--bg-white);
 }
 
-.plot-toggle-row button.active {
-  background: #d71500;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(215, 21, 0, 0.18);
-}
-
-/* --- SHAP SECTIONS --- */
 .shap-sections-stack {
   display: flex;
   flex-direction: column;
@@ -228,13 +173,12 @@
 }
 
 .shap-plot-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-top: 4px solid #d71500;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--primary-red);
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
 }
 
 .shap-plot-header {
@@ -243,22 +187,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
 }
 
 .shap-plot-header h3 {
   margin: 0 0 6px 0;
   font-size: 18px;
-  font-weight: 600;
-  color: #0f172a;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .shap-plot-header p {
   margin: 0;
   font-size: 13px;
-  color: #64748b;
-  font-weight: 400;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .shap-plot-body {
@@ -266,62 +208,41 @@
   height: 430px;
 }
 
-/* --- CHART / EXPLAINABILITY TOGGLE --- */
-.chart-toggle {
+.shap-chart-toggle {
   display: inline-flex;
   background: #f1f5f9;
   padding: 4px;
   border-radius: 10px;
   gap: 4px;
-  flex-shrink: 0;
 }
 
-.chart-toggle button {
-  border: none;
-  background: transparent;
-  color: #64748b;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.chart-toggle button:hover {
-  color: #334155;
-}
-
-.chart-toggle button.active {
-  background: #ffffff;
-  color: #d71500;
+.shap-chart-toggle button.active {
+  background: var(--bg-white);
+  color: var(--primary-red);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
 }
 
-/* --- CHARTS --- */
-.chart-container {
+.shap-chart-container {
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
-.empty-state {
+.shap-empty-state {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   color: #94a3b8;
   font-size: 14px;
+  font-weight: 600;
 }
 
-/* --- EXPLAINABILITY PANEL --- */
-.explainability-panel {
+.shap-explainability-panel {
   height: 100%;
   overflow-y: auto;
   padding: 20px;
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--bg-white);
   border: 1px solid #f1f5f9;
   color: #334155;
   font-size: 15px;
@@ -329,89 +250,21 @@
   font-weight: 500;
 }
 
-.explainability-panel p {
-  margin: 0 0 14px 0;
-}
-
-.explainability-panel p:last-child {
-  margin-bottom: 0;
-}
-
-/* --- TOOLTIP --- */
-.custom-tooltip {
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+.shap-custom-tooltip {
+  background-color: var(--bg-white);
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
   font-size: 12px;
   color: #1e293b;
 }
 
-.custom-tooltip p {
-  margin: 2px 0;
+.shap-spin {
+  animation: shapSpin 1.5s linear infinite;
 }
 
-.tooltip-heading {
-  font-weight: bold;
-  margin-bottom: 4px !important;
-}
-
-/* --- ANIMATIONS --- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.spin {
-  animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
+@keyframes shapSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-/* --- RESPONSIVE --- */
-@media (max-width: 768px) {
-  .modal-content {
-    width: 96%;
-    max-height: 94vh;
-  }
-
-  .modal-header {
-    padding: 20px;
-    align-items: flex-start;
-  }
-
-  .modal-body {
-    padding: 20px;
-  }
-
-  .shap-plot-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .chart-toggle,
-  .plot-toggle-row {
-    width: 100%;
-  }
-
-  .chart-toggle button,
-  .plot-toggle-row button {
-    flex: 1;
-  }
-
-  .shap-plot-body {
-    height: 420px;
-    padding: 18px;
-  }
-}
-
-

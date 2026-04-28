@@ -14,8 +14,7 @@ import {
   Legend,
   Bar,
   Line,
-  ComposedChart,
-  LabelList
+  ComposedChart
 } from 'recharts';
 import './ChartPanel.css';
 
@@ -25,7 +24,7 @@ function ChartPanel({ chartData }) {
   const RISK_COLORS = {
     Low: '#22c55e',
     Medium: '#d46b08',
-    High: '#cf1322',
+    High: '#b91c1c',
     Critical: '#5c0011'
   };
 
@@ -33,7 +32,7 @@ function ChartPanel({ chartData }) {
     '#5C0011',
     '#8B0000',
     '#B91C1C',
-    '#D32F2F',
+    '#D71500',
     '#F97316',
     '#FB8C00',
     '#F59E0B',
@@ -42,25 +41,36 @@ function ChartPanel({ chartData }) {
     '#9CA3AF'
   ];
 
+  const DONUT_CONFIG = {
+    height: 330,
+    cx: '38%',
+    cy: '50%',
+    innerRadius: 62,
+    outerRadius: 90,
+    margin: { top: 10, right: 20, bottom: 10, left: 20 }
+  };
+
   const getDonutColor = (name) => {
     if (name === 'Low Risk') return '#22c55e';
     if (name === 'Medium Risk') return '#d46b08';
-    if (name === 'High Risk') return '#cf1322';
+    if (name === 'High Risk') return '#b91c1c';
     if (name === 'Critical') return '#5c0011';
 
-    if (name === 'Risky Hospitals') return '#D71500';
+    if (name === 'Risky Hospitals') return '#d71500';
     if (name === 'Safe Hospitals') return '#E6E8EB';
 
-    return '#D71500';
+    return '#d71500';
   };
 
-  const formatCurrency = (value) => {
-    if (value === null || value === undefined) return '0';
+  const formatNumber = (value) => {
+    const num = Number(value || 0);
 
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 0
-    }).format(value);
+    }).format(num);
   };
+
+  const formatCurrency = (value) => `$${formatNumber(value)}`;
 
   const buildPieData = (donutPayload) => {
     return (donutPayload?.labels || [])
@@ -71,15 +81,52 @@ function ChartPanel({ chartData }) {
       .filter((item) => item.value > 0);
   };
 
+  const BubbleTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+
+      return (
+        <div className="chart-panel-tooltip">
+          <p className="tooltip-title">{data.label}</p>
+          <p>DSO: <strong>{data.x}</strong></p>
+          <p>Credit Used: <strong>{formatCurrency(data.y)}</strong></p>
+          <p>Tier: <strong>{data.risk_tier || 'Unknown'}</strong></p>
+          <p className="tooltip-muted">Bubble size = total payments</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const TierComparisonTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const row = payload[0].payload;
+
+      return (
+        <div className="chart-panel-tooltip">
+          <p className="tooltip-title">{label}</p>
+          <p>Total Exposure: <strong>{formatCurrency(row.total_exposure_raw)}</strong></p>
+          <p>Hospitals: <strong>{formatNumber(row.hospital_count)}</strong></p>
+          <p>Average Risk Score: <strong>{Number(row.avg_risk_score || 0).toFixed(1)}</strong></p>
+          <p className="tooltip-muted">Bars are normalized for visual comparison.</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   const renderChart = () => {
     if (!chartData) return <div className="no-data">No data available</div>;
 
+    /* ---------------- BUBBLE ---------------- */
     if (activeChart === 'bubble') {
       const coloredBubbleData = (chartData.bubble || []).map((item) => ({
         ...item,
         fill:
           item.risk === 1
-            ? RISK_COLORS[item.risk_tier] || '#D71500'
+            ? RISK_COLORS[item.risk_tier] || '#d71500'
             : '#22c55e'
       }));
 
@@ -103,32 +150,15 @@ function ChartPanel({ chartData }) {
               dataKey="y"
               name="Credit Used"
               type="number"
+              tickFormatter={(value) => formatNumber(value)}
               label={{ value: 'Credit Used', angle: -90, position: 'insideLeft' }}
             />
 
             <ZAxis dataKey="size" range={[50, 400]} name="Total Payments" />
 
-            <Tooltip
-              cursor={{ strokeDasharray: '3 3' }}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
+            <Tooltip content={<BubbleTooltip />} />
 
-                  return (
-                    <div className="custom-tooltip">
-                      <p className="tooltip-title">{data.label}</p>
-                      <p>DSO: {data.x}</p>
-                      <p>Credit: {data.y}</p>
-                      <p>Tier: {data.risk_tier || 'Unknown'}</p>
-                    </div>
-                  );
-                }
-
-                return null;
-              }}
-            />
-
-            <Scatter data={coloredBubbleData} shape="circle">
+            <Scatter data={coloredBubbleData}>
               {coloredBubbleData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
@@ -143,6 +173,7 @@ function ChartPanel({ chartData }) {
       );
     }
 
+    /* ---------------- RISK DONUT ---------------- */
     if (activeChart === 'donut') {
       const data = buildPieData(chartData.donut);
 
@@ -151,15 +182,15 @@ function ChartPanel({ chartData }) {
       }
 
       return (
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+        <ResponsiveContainer width="100%" height={DONUT_CONFIG.height}>
+          <PieChart margin={DONUT_CONFIG.margin}>
             <Pie
               data={data}
-              cx="40%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={4}
+              cx={DONUT_CONFIG.cx}
+              cy={DONUT_CONFIG.cy}
+              innerRadius={DONUT_CONFIG.innerRadius}
+              outerRadius={DONUT_CONFIG.outerRadius}
+              paddingAngle={3}
               dataKey="value"
               label={false}
               labelLine={false}
@@ -188,6 +219,7 @@ function ChartPanel({ chartData }) {
       );
     }
 
+    /* ---------------- SPECIALTY DONUT ---------------- */
     if (activeChart === 'specialty') {
       const data = buildPieData(chartData.specialty_donut);
 
@@ -196,14 +228,14 @@ function ChartPanel({ chartData }) {
       }
 
       return (
-        <ResponsiveContainer width="100%" height={330}>
-          <PieChart>
+        <ResponsiveContainer width="100%" height={DONUT_CONFIG.height}>
+          <PieChart margin={DONUT_CONFIG.margin}>
             <Pie
               data={data}
-              cx="38%"
-              cy="50%"
-              innerRadius={62}
-              outerRadius={90}
+              cx={DONUT_CONFIG.cx}
+              cy={DONUT_CONFIG.cy}
+              innerRadius={DONUT_CONFIG.innerRadius}
+              outerRadius={DONUT_CONFIG.outerRadius}
               paddingAngle={3}
               dataKey="value"
               label={false}
@@ -236,6 +268,7 @@ function ChartPanel({ chartData }) {
       );
     }
 
+    /* ---------------- RISK TIER COMPARISON ---------------- */
     if (activeChart === 'line') {
       const rawData = chartData.line || [];
 
@@ -255,10 +288,8 @@ function ChartPanel({ chartData }) {
 
       const composedData = rawData.map((item) => ({
         tier: item.tier,
-
         exposureBar: (Number(item.total_exposure_raw || 0) / maxExposure) * 100,
         hospitalBar: (Number(item.hospital_count || 0) / maxHospitalCount) * 100,
-
         total_exposure_raw: Number(item.total_exposure_raw || 0),
         hospital_count: Number(item.hospital_count || 0),
         avg_risk_score: Number(item.avg_risk_score || 0)
@@ -272,111 +303,27 @@ function ChartPanel({ chartData }) {
             barGap={10}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6E8EB" />
-
-            <XAxis
-              dataKey="tier"
-              label={{ value: 'Risk Tier', position: 'insideBottom', offset: -8 }}
-            />
-
-            <YAxis
-              yAxisId="left"
-              domain={[0, 115]}
-              tickFormatter={(value) => `${value}%`}
-              label={{
-                value: 'Relative Business Scale',
-                angle: -90,
-                position: 'insideLeft'
-              }}
-            />
-
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              domain={[0, 100]}
-              tickFormatter={(value) => `${value}`}
-              label={{
-                value: 'Avg Risk Score',
-                angle: 90,
-                position: 'insideRight'
-              }}
-            />
-
-            <Tooltip
-              content={({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-
-                  return (
-                    <div className="custom-tooltip">
-                      <p className="tooltip-title">{label}</p>
-                      <p>Total Exposure: {formatCurrency(data.total_exposure_raw)}</p>
-                      <p>Hospital Count: {data.hospital_count}</p>
-                      <p>Avg Risk Score: {data.avg_risk_score.toFixed(2)}</p>
-                    </div>
-                  );
-                }
-
-                return null;
-              }}
-            />
-
+            <XAxis dataKey="tier" />
+            <YAxis yAxisId="left" domain={[0, 115]} tickFormatter={(v) => `${v}%`} />
+            <YAxis yAxisId="right" orientation="right" domain={[0, 100]} />
+            <Tooltip content={<TierComparisonTooltip />} />
             <Legend />
 
             <Bar
               yAxisId="left"
               dataKey="exposureBar"
-              name="Total Exposure"
+              name="Exposure Scale"
               fill="#5C0011"
               radius={[7, 7, 0, 0]}
-            >
-              <LabelList
-                position="top"
-                content={(props) => {
-                  const { x, y, width } = props;
-
-                  return (
-                    <text
-                      x={x + width / 2}
-                      y={y - 8}
-                      textAnchor="middle"
-                      fontSize={11}
-                      fill="#5C0011"
-                      fontWeight={700}
-                    >
-                      Exposure
-                    </text>
-                  );
-                }}
-              />
-            </Bar>
+            />
 
             <Bar
               yAxisId="left"
               dataKey="hospitalBar"
-              name="Hospital Count"
-              fill="#D32F2F"
+              name="Hospital Count Scale"
+              fill="#D71500"
               radius={[7, 7, 0, 0]}
-            >
-              <LabelList
-                position="top"
-                content={(props) => {
-                  const { x, y, width } = props;
-
-                  return (
-                    <text
-                      x={x + width / 2}
-                      y={y - 8}
-                      textAnchor="middle"
-                      fontSize={11}
-                      fill="#991B1B"
-                      fontWeight={700}
-                    >
-                      Hospitals
-                    </text>
-                  );
-                }}
-              />
-            </Bar>
+            />
 
             <Line
               yAxisId="right"
@@ -385,20 +332,9 @@ function ChartPanel({ chartData }) {
               name="Avg Risk Score"
               stroke="#F28B82"
               strokeWidth={3}
-              dot={{ r: 5, stroke: '#F28B82', fill: '#ffffff' }}
-              activeDot={{ r: 7, stroke: '#F28B82', fill: '#ffffff' }}
-            >
-              <LabelList
-                dataKey="avg_risk_score"
-                position="top"
-                formatter={(val) => `Risk: ${val.toFixed(1)}`}
-                style={{
-                  fontSize: 11,
-                  fill: '#F28B82',
-                  fontWeight: 700
-                }}
-              />
-            </Line>
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
           </ComposedChart>
         </ResponsiveContainer>
       );
@@ -414,6 +350,7 @@ function ChartPanel({ chartData }) {
 
         <div className="chart-toggles">
           <button
+            type="button"
             className={activeChart === 'bubble' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('bubble')}
           >
@@ -421,6 +358,7 @@ function ChartPanel({ chartData }) {
           </button>
 
           <button
+            type="button"
             className={activeChart === 'donut' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('donut')}
           >
@@ -428,6 +366,7 @@ function ChartPanel({ chartData }) {
           </button>
 
           <button
+            type="button"
             className={activeChart === 'specialty' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('specialty')}
           >
@@ -435,6 +374,7 @@ function ChartPanel({ chartData }) {
           </button>
 
           <button
+            type="button"
             className={activeChart === 'line' ? 'toggle-btn active' : 'toggle-btn'}
             onClick={() => setActiveChart('line')}
           >
@@ -443,7 +383,9 @@ function ChartPanel({ chartData }) {
         </div>
       </div>
 
-      <div className="chart-area">{renderChart()}</div>
+      <div key={activeChart} className="chart-area chart-fade">
+        {renderChart()}
+      </div>
     </div>
   );
 }

@@ -1,50 +1,131 @@
-/* Table Container */
 .table-container {
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
 }
 
-/* Main Table */
 .risk-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
 }
 
-/* Table Header */
 .risk-table thead {
-  background-color: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .risk-table th {
-  padding: 12px 16px;
+  padding: 13px 16px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
-  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
   cursor: pointer;
   user-select: none;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
+  white-space: nowrap;
 }
 
 .risk-table th:hover {
   background-color: #f1f5f9;
-  color: #334155;
 }
 
-/* Table Body Cells */
-.risk-table td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #f1f5f9;
+.hospital-header-cell {
+  min-width: 310px;
+  cursor: default;
+}
+
+.hospital-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hospital-sort-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.hospital-sort-btn:hover {
+  color: var(--primary-red);
+}
+
+.hospital-search-wrapper {
+  position: relative;
+  width: 145px;
+  flex-shrink: 0;
+}
+
+.hospital-search-input {
+  width: 100%;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-white);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  padding: 0 26px 0 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: inherit;
+}
+
+.hospital-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.hospital-search-input:focus {
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgba(215, 21, 0, 0.08);
+}
+
+.hospital-search-clear {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--text-secondary);
+  cursor: pointer;
   font-size: 14px;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hospital-search-clear:hover {
+  background: rgba(215, 21, 0, 0.08);
+  color: var(--primary-red);
+}
+
+.risk-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
   color: #334155;
   vertical-align: middle;
 }
@@ -54,86 +135,88 @@
 }
 
 .risk-table tbody tr:hover {
-  background-color: #fcfcfc;
+  background-color: #fcfcfd;
 }
 
-/* Text Utilities */
 .text-primary {
-  font-weight: 500;
-  color: #0f172a;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* Risk Tier Badges */
 .badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.badge-low { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-.badge-medium { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-.badge-high { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-.badge-critical { background: #fef2f2; color: #7f1d1d; border: 1px solid #fca5a5; }
+.badge-low {
+  background: var(--risk-low-bg);
+  color: var(--risk-low);
+  border: 1px solid var(--risk-low-border);
+}
 
-/* Action Column & Button */
+.badge-medium {
+  background: var(--risk-medium-bg);
+  color: var(--risk-medium);
+  border: 1px solid var(--risk-medium-border);
+}
+
+.badge-high {
+  background: var(--risk-high-bg);
+  color: var(--risk-high);
+  border: 1px solid var(--risk-high-border);
+}
+
+.badge-critical {
+  background: var(--risk-critical-bg);
+  color: var(--risk-critical);
+  border: 1px solid var(--risk-critical-border);
+}
+
 .action-col {
   width: 100px;
   text-align: center;
 }
 
-.view-btn {
-  background-color: #ffffff;
+.view-btn,
+.pagination-btn {
+  background-color: var(--bg-white);
   border: 1px solid #cbd5e1;
-  color: #475569;
-  padding: 6px 12px;
-  border-radius: 4px;
+  color: var(--text-secondary);
+  padding: 7px 13px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.view-btn:hover {
-  border-color: #94a3b8;
-  background-color: #f8fafc;
-  color: #0f172a;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.view-btn:hover,
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--primary-red);
+  background-color: rgba(215, 21, 0, 0.05);
+  color: var(--primary-red);
 }
 
-/* Pagination */
 .pagination-controls {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   padding: 12px 16px;
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--bg-white);
+  border-top: 1px solid var(--border-color);
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .pagination-info {
   font-size: 13px;
-  color: #64748b;
-}
-
-.pagination-btn {
-  padding: 6px 12px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  color: #475569;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  border-color: #94a3b8;
-  background-color: #f8fafc;
-  color: #0f172a;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .pagination-btn:disabled {
@@ -142,10 +225,11 @@
   background-color: #f1f5f9;
 }
 
-/* Empty State */
-.table-empty-state {
-  padding: 40px;
+.table-empty-cell {
+  height: 260px;
   text-align: center;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 14px;
+  font-weight: 600;
+  background: var(--bg-white);
 }

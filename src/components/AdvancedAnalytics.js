@@ -61,15 +61,15 @@ const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
 
 /* ---------------- COLORS ---------------- */
 
-const CLUSTER_COLORS = ['#D71500', '#FACC15', '#F97316','#5C0011', '#9CA3AF'];
+const CLUSTER_COLORS = ['#D71500', '#FACC15', '#F97316', '#5C0011', '#9CA3AF'];
 
-const getClusterColor = (id) => CLUSTER_COLORS[id % CLUSTER_COLORS.length];
+const getClusterColor = (id = 0) => CLUSTER_COLORS[Math.abs(Number(id || 0)) % CLUSTER_COLORS.length];
 
 const getRiskColor = (risk) => {
   const value = Number(risk || 0);
-  if (value >= 75) return '#ef4444';
-  if (value >= 50) return '#f97316';
-  if (value >= 25) return '#eab308';
+  if (value >= 75) return '#5C0011';
+  if (value >= 50) return '#d71500';
+  if (value >= 25) return '#d46b08';
   return '#22c55e';
 };
 
@@ -171,17 +171,17 @@ const GeoHeatmapChart = ({ data }) => {
   const { center, bounds } = useMemo(() => getMapBounds(points), [points]);
 
   if (!points.length) {
-    return <div className="empty-state">No valid geographic data available</div>;
+    return <div className="analytics-empty-state">No valid geographic data available</div>;
   }
 
   return (
-    <div className="chart-container">
-      <div className="chart-title">Geographic Risk Intensity</div>
-      <div className="chart-subtitle">
+    <div className="analytics-chart-card">
+      <div className="analytics-chart-title">Geographic Risk Intensity</div>
+      <div className="analytics-chart-subtitle">
         Hospital locations colored by risk intensity
       </div>
 
-      <div className="map-body">
+      <div className="analytics-map-body">
         <MapContainer
           center={center}
           bounds={bounds}
@@ -215,7 +215,7 @@ const GeoHeatmapChart = ({ data }) => {
                   <div>Risk: <strong>{p.risk_percent.toFixed(1)}%</strong></div>
                   <div>Tier: {p.risk_tier || 'N/A'}</div>
                   <div>Specialty: {p.specialty || 'N/A'}</div>
-                  <div>Exposure: {Number(p.ar_exposure || 0).toLocaleString()}</div>
+                  <div>Exposure: ${Number(p.ar_exposure || 0).toLocaleString()}</div>
                   <div>DSO 30d: {p.dso_30d || 0}</div>
                 </div>
               </LeafletTooltip>
@@ -230,9 +230,9 @@ const GeoHeatmapChart = ({ data }) => {
 /* ---------------- CLUSTER SCATTER ---------------- */
 
 const ZoneBadge = ({ className = '', style = {}, title, meaning }) => (
-  <div className={`zone-badge ${className}`} style={style}>
+  <div className={`analytics-zone-badge ${className}`} style={style}>
     {title}
-    <div className="zone-tooltip">{meaning}</div>
+    <div className="analytics-zone-tooltip">{meaning}</div>
   </div>
 );
 
@@ -246,6 +246,7 @@ const ClusterScatterChart = ({ data }) => {
       (cluster.points || []).forEach((point) => {
         allPoints.push({
           ...point,
+          cluster: Number(point.cluster ?? cluster.cluster_id ?? 0),
           clusterColor: getClusterColor(cluster.cluster_id)
         });
       });
@@ -255,25 +256,25 @@ const ClusterScatterChart = ({ data }) => {
   }, [data]);
 
   if (!chartData.length) {
-    return <div className="empty-state">No Cluster Data</div>;
+    return <div className="analytics-empty-state">No cluster data available</div>;
   }
 
   return (
-    <div className="chart-container cluster-chart-container">
-      <div className="chart-title">Clustered Risk Exposure</div>
-      <div className="chart-subtitle">
+    <div className="analytics-chart-card analytics-cluster-chart-card">
+      <div className="analytics-chart-title">Clustered Risk Exposure</div>
+      <div className="analytics-chart-subtitle">
         Payment delay vs credit usage with risk intensity and clustering
       </div>
 
-      <div className="cluster-chart-body">
+      <div className="analytics-cluster-chart-body">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 40, right: 30, bottom: 40, left: 40 }}>
+          <ScatterChart margin={{ top: 40, right: 30, bottom: 40, left: 50 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
 
             <XAxis
               dataKey="x"
               type="number"
-              name="DSO (30D)"
+              name="DSO 30D"
               label={{
                 value: 'Payment Delay (DSO - 30 Days)',
                 position: 'bottom',
@@ -298,11 +299,7 @@ const ClusterScatterChart = ({ data }) => {
               stroke="#94a3b8"
             />
 
-            <ZAxis
-              dataKey="risk_percent"
-              range={[60, 400]}
-              name="Risk %"
-            />
+            <ZAxis dataKey="risk_percent" range={[60, 400]} name="Risk %" />
 
             <RechartsTooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -311,24 +308,24 @@ const ClusterScatterChart = ({ data }) => {
                   const p = payload[0].payload;
 
                   return (
-                    <div className="custom-tooltip">
-                      <div className="tooltip-header">
+                    <div className="analytics-custom-tooltip">
+                      <div className="analytics-tooltip-header">
                         {p.hospital_name || 'Unknown Hospital'}
                       </div>
 
-                      <div className="tooltip-row">
+                      <div className="analytics-tooltip-row">
                         Cluster:{' '}
                         <span style={{ color: p.clusterColor, fontWeight: 700 }}>
-                          #{(p.cluster ?? 0) + 1}
+                          #{Number(p.cluster || 0) + 1}
                         </span>
                       </div>
 
-                      <div className="tooltip-row">
+                      <div className="analytics-tooltip-row">
                         Risk:{' '}
                         <strong>{Number(p.risk_percent || 0).toFixed(1)}%</strong>
                       </div>
 
-                      <div className="tooltip-meta">
+                      <div className="analytics-tooltip-meta">
                         DSO: {p.x} | Credit: {p.y}
                       </div>
                     </div>
@@ -357,44 +354,28 @@ const ClusterScatterChart = ({ data }) => {
         title="Stable Zone"
         meaning="Low payment delay and controlled credit usage. These hospitals are financially stable."
         className="top-left-zone"
-        style={{
-          position: 'absolute',
-          top: 70,
-          left: 60
-        }}
+        style={{ position: 'absolute', top: 70, left: 60 }}
       />
 
       <ZoneBadge
         title="High Risk Zone"
         meaning="High payment delay and high credit usage. These hospitals need immediate attention."
         className="danger top-right-zone"
-        style={{
-          position: 'absolute',
-          top: 70,
-          right: 40
-        }}
+        style={{ position: 'absolute', top: 70, right: 40 }}
       />
 
       <ZoneBadge
         title="Low Credit / Low Risk"
         meaning="Low credit usage and low payment delay. Exposure risk is currently limited."
-        className="bottom-zone bottom-left-zone"
-        style={{
-          position: 'absolute',
-          bottom: 52,
-          left: 60
-        }}
+        className="bottom-left-zone"
+        style={{ position: 'absolute', bottom: 52, left: 60 }}
       />
 
       <ZoneBadge
         title="Watchlist"
         meaning="Delay or exposure signals are emerging. Monitor these hospitals closely."
-        className="warning bottom-zone bottom-right-zone"
-        style={{
-          position: 'absolute',
-          bottom: 52,
-          right: 40
-        }}
+        className="warning bottom-right-zone"
+        style={{ position: 'absolute', bottom: 52, right: 40 }}
       />
     </div>
   );
@@ -498,15 +479,15 @@ const AdvancedAnalytics = ({ filters }) => {
   return (
     <div className="advanced-analytics">
       <div className="analytics-buttons">
-        <button onClick={handleGeoClick} className="analytics-btn">
-          <div className="icon-wrap">
+        <button onClick={handleGeoClick} className="analytics-btn" type="button">
+          <div className="analytics-icon-wrap">
             <MapIcon size={16} />
           </div>
           <span>Geo Risk Map</span>
         </button>
 
-        <button onClick={handleClusterClick} className="analytics-btn">
-          <div className="icon-wrap">
+        <button onClick={handleClusterClick} className="analytics-btn" type="button">
+          <div className="analytics-icon-wrap">
             <ScatterIcon size={16} />
           </div>
           <span>Hospital Clusters</span>
@@ -515,35 +496,36 @@ const AdvancedAnalytics = ({ filters }) => {
 
       {geoState.isOpen && (
         <div
-          className="modal-backdrop"
+          className="analytics-modal-backdrop"
           onClick={() => setGeoState((prev) => ({ ...prev, isOpen: false }))}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className="analytics-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="analytics-modal-header">
               <h3>{geoState.data?.title || 'Geographic Risk Heatmap'}</h3>
 
-              <div className="modal-controls">
-                <button onClick={fetchGeoData} disabled={geoState.loading} className="btn-icon">
-                  <RefreshIcon size={14} className={geoState.loading ? 'spin' : ''} />
+              <div className="analytics-modal-controls">
+                <button onClick={fetchGeoData} disabled={geoState.loading} className="analytics-btn-icon" type="button">
+                  <RefreshIcon size={14} className={geoState.loading ? 'analytics-spin' : ''} />
                   Refresh
                 </button>
 
                 <button
                   onClick={() => setGeoState((prev) => ({ ...prev, isOpen: false }))}
-                  className="btn-close"
+                  className="analytics-btn-close"
+                  type="button"
                 >
                   <XIcon size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="modal-body">
+            <div className="analytics-modal-body">
               {geoState.loading ? (
-                <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#D71500" />
+                <div className="analytics-loading-container">
+                  <RefreshIcon size={32} className="analytics-spin" color="#D71500" />
                 </div>
               ) : geoState.error ? (
-                <div className="error-container">Error: {geoState.error}</div>
+                <div className="analytics-error-container">Error: {geoState.error}</div>
               ) : (
                 <GeoHeatmapChart data={geoState.data} />
               )}
@@ -554,39 +536,41 @@ const AdvancedAnalytics = ({ filters }) => {
 
       {clusterState.isOpen && (
         <div
-          className="modal-backdrop"
+          className="analytics-modal-backdrop"
           onClick={() => setClusterState((prev) => ({ ...prev, isOpen: false }))}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className="analytics-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="analytics-modal-header">
               <h3>{clusterState.data?.title || 'Hospital Cluster Analysis'}</h3>
 
-              <div className="modal-controls">
+              <div className="analytics-modal-controls">
                 <button
                   onClick={fetchClusterData}
                   disabled={clusterState.loading}
-                  className="btn-icon"
+                  className="analytics-btn-icon"
+                  type="button"
                 >
-                  <RefreshIcon size={14} className={clusterState.loading ? 'spin' : ''} />
+                  <RefreshIcon size={14} className={clusterState.loading ? 'analytics-spin' : ''} />
                   Refresh
                 </button>
 
                 <button
                   onClick={() => setClusterState((prev) => ({ ...prev, isOpen: false }))}
-                  className="btn-close"
+                  className="analytics-btn-close"
+                  type="button"
                 >
                   <XIcon size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="modal-body">
+            <div className="analytics-modal-body">
               {clusterState.loading ? (
-                <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#D71500" />
+                <div className="analytics-loading-container">
+                  <RefreshIcon size={32} className="analytics-spin" color="#D71500" />
                 </div>
               ) : clusterState.error ? (
-                <div className="error-container">Error: {clusterState.error}</div>
+                <div className="analytics-error-container">Error: {clusterState.error}</div>
               ) : (
                 <ClusterScatterChart data={clusterState.data} />
               )}

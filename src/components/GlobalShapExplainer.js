@@ -1,20 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import {
-  ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
 } from 'recharts';
 import './GlobalShapExplainer.css';
 import api from '../api';
 
 /* ---------------- INLINE ICONS ---------------- */
 
-const ActivityIcon = ({ size = 24, color = "currentColor" }) => (
+const ActivityIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
   </svg>
 );
 
-const BarChartIcon = ({ size = 24, color = "currentColor" }) => (
+const BarChartIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="20" x2="12" y2="10"></line>
     <line x1="18" y1="20" x2="18" y2="4"></line>
@@ -22,13 +30,13 @@ const BarChartIcon = ({ size = 24, color = "currentColor" }) => (
   </svg>
 );
 
-const RefreshIcon = ({ size = 24, color = "currentColor", className = "" }) => (
+const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
   <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
   </svg>
 );
 
-const XIcon = ({ size = 24, color = "currentColor" }) => (
+const XIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18"></line>
     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -38,7 +46,7 @@ const XIcon = ({ size = 24, color = "currentColor" }) => (
 /* ---------------- HELPERS ---------------- */
 
 const getShapColor = (shapValue) => {
-  return shapValue >= 0 ? '#d71500' : '#22c55e';
+  return Number(shapValue || 0) >= 0 ? '#d71500' : '#22c55e';
 };
 
 const renderParagraphs = (text) => {
@@ -55,10 +63,10 @@ const CustomTooltip = ({ active, payload }) => {
     const data = payload[0].payload;
 
     return (
-      <div className="custom-tooltip">
-        <p className="tooltip-heading">{data.feature}</p>
-        <p>SHAP Value: <strong>{data.shapValue.toFixed(4)}</strong></p>
-        <p>Feature Value: <strong>{data.featureValue.toFixed(4)}</strong></p>
+      <div className="shap-custom-tooltip">
+        <p className="shap-tooltip-heading">{data.feature}</p>
+        <p>SHAP Value: <strong>{Number(data.shapValue || 0).toFixed(4)}</strong></p>
+        <p>Feature Value: <strong>{Number(data.featureValue || 0).toFixed(4)}</strong></p>
       </div>
     );
   }
@@ -110,7 +118,7 @@ const ShapBeeswarmChart = ({ data }) => {
         cy={cy}
         r={5}
         fill={payload.color}
-        stroke="#fff"
+        stroke="#ffffff"
         strokeWidth={1}
         opacity={0.85}
       />
@@ -118,11 +126,11 @@ const ShapBeeswarmChart = ({ data }) => {
   };
 
   if (!chartData.length) {
-    return <div className="empty-state">No beeswarm data available</div>;
+    return <div className="shap-empty-state">No beeswarm data available</div>;
   }
 
   return (
-    <div className="chart-container">
+    <div className="shap-chart-container">
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 100 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -139,7 +147,9 @@ const ShapBeeswarmChart = ({ data }) => {
             name="Feature"
             domain={[-1, features.length]}
             ticks={ticks.map((tick) => tick.value)}
-            tickFormatter={(value) => ticks.find((tick) => tick.value === Math.round(value))?.label || ''}
+            tickFormatter={(value) =>
+              ticks.find((tick) => tick.value === Math.round(value))?.label || ''
+            }
             tick={{ fontSize: 11 }}
             width={90}
             stroke="#94a3b8"
@@ -159,11 +169,11 @@ const ShapBarChart = ({ data }) => {
   }, [data]);
 
   if (!chartData.length) {
-    return <div className="empty-state">No bar data available</div>;
+    return <div className="shap-empty-state">No bar data available</div>;
   }
 
   return (
-    <div className="chart-container">
+    <div className="shap-chart-container">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           layout="vertical"
@@ -173,8 +183,8 @@ const ShapBarChart = ({ data }) => {
           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
           <XAxis type="number" tick={{ fontSize: 12 }} stroke="#94a3b8" />
           <YAxis type="category" dataKey="feature" tick={{ fontSize: 11 }} width={100} stroke="#94a3b8" />
-          <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '4px', border: '1px solid #e2e8f0' }} />
-          <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
+          <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0' }} />
+          <Bar dataKey="importance" radius={[0, 6, 6, 0]}>
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill="#d71500" />
             ))}
@@ -203,10 +213,11 @@ const ShapSection = ({
           <p>{subtitle}</p>
         </div>
 
-        <div className="chart-toggle">
+        <div className="shap-chart-toggle">
           <button
             className={activeView === 'chart' ? 'active' : ''}
             onClick={() => setActiveView('chart')}
+            type="button"
           >
             Chart
           </button>
@@ -214,6 +225,7 @@ const ShapSection = ({
           <button
             className={activeView === 'explainability' ? 'active' : ''}
             onClick={() => setActiveView('explainability')}
+            type="button"
           >
             Explainability
           </button>
@@ -224,7 +236,7 @@ const ShapSection = ({
         {activeView === 'chart' ? (
           chart
         ) : (
-          <div className="explainability-panel">
+          <div className="shap-explainability-panel">
             {renderParagraphs(explanation)}
           </div>
         )}
@@ -286,7 +298,7 @@ const GlobalShapExplainer = () => {
 
   return (
     <>
-      <button onClick={handleOpen} className="shap-action-button">
+      <button onClick={handleOpen} className="shap-action-button" type="button">
         <div className="shap-icon-wrapper">
           <ActivityIcon size={18} />
         </div>
@@ -294,39 +306,39 @@ const GlobalShapExplainer = () => {
       </button>
 
       {isOpen && (
-        <div className="modal-backdrop" onClick={handleClose}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-title-group">
+        <div className="shap-modal-backdrop" onClick={handleClose}>
+          <div className="shap-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="shap-modal-header">
+              <div className="shap-modal-title-group">
                 <BarChartIcon size={20} color="#334155" />
                 <h2>Global SHAP Explainability</h2>
               </div>
 
-              <div className="modal-controls">
-                <button onClick={handleRefresh} disabled={loading} className="btn-icon">
-                  <RefreshIcon size={14} className={loading ? 'spin' : ''} />
+              <div className="shap-modal-controls">
+                <button onClick={handleRefresh} disabled={loading} className="shap-btn-icon" type="button">
+                  <RefreshIcon size={14} className={loading ? 'shap-spin' : ''} />
                   Refresh
                 </button>
 
-                <button onClick={handleClose} className="btn-close">
+                <button onClick={handleClose} className="shap-btn-close" type="button">
                   <XIcon size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="modal-body">
+            <div className="shap-modal-body">
               {loading && (
-                <div className="loading-container">
-                  <RefreshIcon size={32} className="spin" color="#d71500" />
-                  <span className="loading-text">Analyzing model features...</span>
+                <div className="shap-loading-container">
+                  <RefreshIcon size={32} className="shap-spin" color="#d71500" />
+                  <span className="shap-loading-text">Analyzing model features...</span>
                 </div>
               )}
 
               {error && (
-                <div className="error-container">
+                <div className="shap-error-container">
                   <strong>Error:</strong> {error}
                   <br />
-                  <button onClick={() => fetchData(true)} className="retry-btn">
+                  <button onClick={() => fetchData(true)} className="shap-retry-btn" type="button">
                     Try Again
                   </button>
                 </div>
@@ -334,10 +346,11 @@ const GlobalShapExplainer = () => {
 
               {!loading && !error && data && (
                 <>
-                  <div className="plot-toggle-row">
+                  <div className="shap-plot-toggle-row">
                     <button
                       className={activePlot === 'bar' ? 'active' : ''}
                       onClick={() => setActivePlot('bar')}
+                      type="button"
                     >
                       Bar Plot
                     </button>
@@ -345,6 +358,7 @@ const GlobalShapExplainer = () => {
                     <button
                       className={activePlot === 'beeswarm' ? 'active' : ''}
                       onClick={() => setActivePlot('beeswarm')}
+                      type="button"
                     >
                       Beeswarm Plot
                     </button>

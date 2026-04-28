@@ -1,11 +1,11 @@
 .header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background-color: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
   padding: 0 32px;
   height: 64px;
   display: flex;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -20,24 +20,17 @@
   align-items: center;
 }
 
-/* LEFT BRAND AREA */
 .brand {
   display: flex;
-  align-items: center;
-}
-
-.header-title {
-  display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 20px;
 }
 
-.header-title h2 {
+.brand h2 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1;
 }
@@ -48,10 +41,8 @@
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-    margin-right: 12px;
 }
 
-/* Right Side Styling */
 .header-right {
   display: flex;
   align-items: center;
@@ -66,18 +57,17 @@
 
 .username {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #334155;
   line-height: 1.2;
 }
 
 .role {
   font-size: 12px;
-  color: #64748b;
-  font-weight: 400;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* Profile Wrapper (Positioning for Dropdown) */
 .profile-wrapper {
   position: relative;
   cursor: pointer;
@@ -88,56 +78,62 @@
 .avatar-circle {
   width: 40px;
   height: 40px;
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: rgba(215, 21, 0, 0.08);
+  color: var(--primary-red);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  font-weight: 600;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s;
+  font-weight: 800;
+  border: 1px solid rgba(215, 21, 0, 0.16);
+  transition: all 0.2s ease;
 }
 
 .profile-wrapper:hover .avatar-circle {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: rgba(215, 21, 0, 0.13);
+  border-color: rgba(215, 21, 0, 0.28);
 }
 
-/* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
   top: 48px;
   right: 0;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
   width: 180px;
-  padding: 8px 0;
+  padding: 8px;
   z-index: 101;
-  animation: fadeIn 0.15s ease-out;
+  animation: headerFadeIn 0.15s ease-out;
 }
 
 .dropdown-item {
-  padding: 10px 16px;
+  padding: 10px 12px;
   font-size: 14px;
   color: #334155;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
+  border-radius: 8px;
 }
 
 .dropdown-item:hover {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: rgba(215, 21, 0, 0.05);
+  color: var(--primary-red);
 }
 
-/* Animation for dropdown */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes headerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
