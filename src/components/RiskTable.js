@@ -5,10 +5,10 @@ import './RiskTable.css';
 function RiskTable({ tableData }) {
   const navigate = useNavigate();
 
-  const [sortConfig, setSortConfig] = useState({
-    key: null,
-    direction: 'ascending'
-  });
+const [sortConfig, setSortConfig] = useState({
+  key: 'risk_score',
+  direction: 'descending'
+});
 
   const [currentPage, setCurrentPage] = useState(1);
   const [hospitalSearch, setHospitalSearch] = useState('');
