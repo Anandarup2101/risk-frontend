@@ -1,12 +1,4 @@
 /* -----------------------------
-   GLOBAL SCROLL CONTROL
------------------------------ */
-
-.no-scroll {
-  overflow: hidden;
-}
-
-/* -----------------------------
    LOGIN PAGE CONTAINER
 ----------------------------- */
 
@@ -33,7 +25,7 @@
 ----------------------------- */
 
 .login-card {
-  background: #ffffff;
+  background: var(--bg-white);
   padding: 44px 46px;
   border-radius: 20px;
   width: 100%;
@@ -43,8 +35,8 @@
     0 14px 32px rgba(15, 23, 42, 0.1),
     0 4px 12px rgba(15, 23, 42, 0.05);
 
-  border: 1px solid #e2e8f0;
-  border-top: 4px solid #d71500;
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--primary-red);
 }
 
 /* -----------------------------
@@ -54,7 +46,7 @@
 .login-title {
   text-align: center;
   margin: 0 0 32px;
-  color: #d71500;
+  color: var(--primary-red);
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -72,30 +64,30 @@
   display: block;
   margin-bottom: 7px;
   font-size: 13px;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .form-input {
   width: 100%;
   padding: 11px 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
 
   font-size: 14px;
-  color: #0f172a;
+  color: var(--text-primary);
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 .form-input:focus {
-  border-color: #d71500;
+  border-color: var(--primary-red);
   box-shadow: 0 0 0 3px rgba(215, 21, 0, 0.08);
 }
 
 .form-input::placeholder {
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 /* -----------------------------
@@ -107,8 +99,8 @@
   margin-top: 16px;
   padding: 12px;
 
-  background-color: #d71500;
-  color: #ffffff;
+  background-color: var(--primary-red);
+  color: var(--bg-white);
   border: none;
   border-radius: 12px;
 
@@ -121,7 +113,7 @@
 }
 
 .login-btn:hover {
-  background-color: #b91300;
+  background-color: var(--primary-red-hover);
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(215, 21, 0, 0.24);
 }
@@ -138,7 +130,7 @@
 ----------------------------- */
 
 .error-message {
-  color: #d71500;
+  color: var(--primary-red);
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 12px;

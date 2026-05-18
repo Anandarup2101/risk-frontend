@@ -45,8 +45,13 @@ const XIcon = ({ size = 24, color = 'currentColor' }) => (
 
 /* ---------------- HELPERS ---------------- */
 
+const COLORS = {
+  INCREASE: '#d71500',
+  DECREASE: '#22c55e'
+};
+
 const getShapColor = (shapValue) => {
-  return Number(shapValue || 0) >= 0 ? '#d71500' : '#22c55e';
+  return Number(shapValue || 0) >= 0 ? COLORS.INCREASE : COLORS.DECREASE;
 };
 
 const renderParagraphs = (text) => {
@@ -65,7 +70,7 @@ const CustomTooltip = ({ active, payload }) => {
     return (
       <div className="shap-custom-tooltip">
         <p className="shap-tooltip-heading">{data.feature}</p>
-        <p>SHAP Value: <strong>{Number(data.shapValue || 0).toFixed(4)}</strong></p>
+        <p>Risk Impact: <strong>{Number(data.shapValue || 0).toFixed(4)}</strong></p>
         <p>Feature Value: <strong>{Number(data.featureValue || 0).toFixed(4)}</strong></p>
       </div>
     );
@@ -126,7 +131,7 @@ const ShapBeeswarmChart = ({ data }) => {
   };
 
   if (!chartData.length) {
-    return <div className="shap-empty-state">No beeswarm data available</div>;
+    return <div className="shap-empty-state">No impact distribution data available</div>;
   }
 
   return (
@@ -137,7 +142,7 @@ const ShapBeeswarmChart = ({ data }) => {
           <XAxis
             type="number"
             dataKey="x"
-            name="SHAP Value"
+            name="Risk Impact Value"
             tick={{ fontSize: 12 }}
             stroke="#94a3b8"
           />
@@ -169,7 +174,7 @@ const ShapBarChart = ({ data }) => {
   }, [data]);
 
   if (!chartData.length) {
-    return <div className="shap-empty-state">No bar data available</div>;
+    return <div className="shap-empty-state">No driver data available</div>;
   }
 
   return (
@@ -186,7 +191,7 @@ const ShapBarChart = ({ data }) => {
           <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0' }} />
           <Bar dataKey="importance" radius={[0, 6, 6, 0]}>
             {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill="#d71500" />
+              <Cell key={`cell-${index}`} fill={COLORS.INCREASE} />
             ))}
           </Bar>
         </BarChart>
@@ -272,8 +277,8 @@ const GlobalShapExplainer = () => {
 
       setData(response.data);
     } catch (err) {
-      console.error('Error fetching SHAP data:', err);
-      setError(err.response?.data?.detail || err.message || 'Failed to load explainability data.');
+      console.error('Error fetching risk driver data:', err);
+      setError(err.response?.data?.detail || err.message || 'Failed to load risk driver data.');
     } finally {
       setLoading(false);
     }
@@ -302,7 +307,7 @@ const GlobalShapExplainer = () => {
         <div className="shap-icon-wrapper">
           <ActivityIcon size={18} />
         </div>
-        <span>Global SHAP</span>
+        <span>Global Risk Drivers</span>
       </button>
 
       {isOpen && (
@@ -311,7 +316,7 @@ const GlobalShapExplainer = () => {
             <div className="shap-modal-header">
               <div className="shap-modal-title-group">
                 <BarChartIcon size={20} color="#334155" />
-                <h2>Global SHAP Explainability</h2>
+                <h2>Global Risk Driver Analysis</h2>
               </div>
 
               <div className="shap-modal-controls">
@@ -329,8 +334,8 @@ const GlobalShapExplainer = () => {
             <div className="shap-modal-body">
               {loading && (
                 <div className="shap-loading-container">
-                  <RefreshIcon size={32} className="shap-spin" color="#d71500" />
-                  <span className="shap-loading-text">Analyzing model features...</span>
+                  <RefreshIcon size={32} className="shap-spin" color="var(--primary-red)" />
+                  <span className="shap-loading-text">Analyzing risk drivers...</span>
                 </div>
               )}
 
@@ -352,7 +357,7 @@ const GlobalShapExplainer = () => {
                       onClick={() => setActivePlot('bar')}
                       type="button"
                     >
-                      Bar Plot
+                      Top Risk Drivers
                     </button>
 
                     <button
@@ -360,14 +365,14 @@ const GlobalShapExplainer = () => {
                       onClick={() => setActivePlot('beeswarm')}
                       type="button"
                     >
-                      Beeswarm Plot
+                      Risk Impact Distribution
                     </button>
                   </div>
 
                   <div className="shap-sections-stack">
                     {activePlot === 'bar' && (
                       <ShapSection
-                        title="SHAP Bar Plot"
+                        title="Top Risk Drivers"
                         subtitle="Ranks the strongest overall drivers influencing the hospital risk model."
                         activeView={barView}
                         setActiveView={setBarView}
@@ -378,7 +383,7 @@ const GlobalShapExplainer = () => {
 
                     {activePlot === 'beeswarm' && (
                       <ShapSection
-                        title="SHAP Beeswarm Plot"
+                        title="Risk Impact Distribution"
                         subtitle="Shows how feature values push hospital risk higher or lower across the current dataset."
                         activeView={summaryView}
                         setActiveView={setSummaryView}

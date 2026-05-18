@@ -61,17 +61,39 @@ const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
 
 /* ---------------- COLORS ---------------- */
 
-const CLUSTER_COLORS =  [ '#D71500','#FACC15', '#F97316', '#5C0011', '#9CA3AF'];
+// const COLORS = {
+//   PRIMARY: '#d71500',
+//   CRITICAL: '#5c0011',
+//   HIGH: '#b91c1c',
+//   MEDIUM: '#d46b08',
+//   LOW: '#22c55e',
+//   WARNING: '#FACC15',
+//   GRAY: '#9CA3AF'
+// };
+
+const COLORS = {
+  PRIMARY: '#2563EB',     // Bright Blue      → Main brand / default
+  CRITICAL: '#B91C1C',    // Strong Red
+  HIGH: '#EF4444',        // Bright Red
+  MEDIUM: '#F59E0B',      // Clear Orange
+  LOW: '#22C55E',         // Fresh Green
+  WARNING: '#EAB308',     // Golden Yellow
+  GRAY: '#6B7280'         // Neutral Gray
+};
+
+const CLUSTER_COLORS =  [
+    '#FF2D00',   // 7. Red
+];
 
 const getClusterColor = (id = 0) =>
   CLUSTER_COLORS[Math.abs(Number(id || 0)) % CLUSTER_COLORS.length];
 
 const getRiskColor = (risk) => {
   const value = Number(risk || 0);
-  if (value >= 75) return '#5C0011';
-  if (value >= 50) return '#d71500';
-  if (value >= 25) return '#d46b08';
-  return '#22c55e';
+  if (value >= 75) return COLORS.CRITICAL;
+  if (value >= 50) return COLORS.HIGH;
+  if (value >= 25) return COLORS.MEDIUM;
+  return COLORS.LOW;
 };
 
 /* ---------------- HELPERS ---------------- */
@@ -217,7 +239,7 @@ const GeoHeatmapChart = ({ data }) => {
                   <div>Tier: {p.risk_tier || 'N/A'}</div>
                   <div>Specialty: {p.specialty || 'N/A'}</div>
                   <div>Exposure: ${Number(p.ar_exposure || 0).toLocaleString()}</div>
-                  <div>DSO 30d: {p.dso_30d || 0}</div>
+                  <div>Payment Delay: {p.dso_30d || 0}</div>
                 </div>
               </LeafletTooltip>
             </CircleMarker>
@@ -275,9 +297,9 @@ const ClusterScatterChart = ({ data }) => {
             <XAxis
               dataKey="x"
               type="number"
-              name="DSO 30D"
+              name="Payment Delay (30d)"
               label={{
-                value: 'Payment Delay (DSO - 30 Days)',
+                value: 'Payment Delay (30 Days)',
                 position: 'bottom',
                 offset: 10,
                 style: { fontSize: 12, fill: '#475467', fontWeight: 600 }
@@ -327,7 +349,7 @@ const ClusterScatterChart = ({ data }) => {
                       </div>
 
                       <div className="analytics-tooltip-meta">
-                        DSO: {p.x} | Credit: {p.y}
+                        Delay: {p.x} | Credit: {p.y}
                       </div>
                     </div>
                   );
@@ -523,7 +545,7 @@ const AdvancedAnalytics = ({ filters }) => {
             <div className="analytics-modal-body">
               {geoState.loading ? (
                 <div className="analytics-loading-container">
-                  <RefreshIcon size={32} className="analytics-spin" color="#D71500" />
+                  <RefreshIcon size={32} className="analytics-spin" color="var(--primary-red)" />
                 </div>
               ) : geoState.error ? (
                 <div className="analytics-error-container">Error: {geoState.error}</div>
@@ -568,7 +590,7 @@ const AdvancedAnalytics = ({ filters }) => {
             <div className="analytics-modal-body analytics-modal-body-cluster">
               {clusterState.loading ? (
                 <div className="analytics-loading-container">
-                  <RefreshIcon size={32} className="analytics-spin" color="#D71500" />
+                  <RefreshIcon size={32} className="analytics-spin" color="var(--primary-red)" />
                 </div>
               ) : clusterState.error ? (
                 <div className="analytics-error-container">Error: {clusterState.error}</div>

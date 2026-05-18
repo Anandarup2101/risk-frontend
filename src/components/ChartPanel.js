@@ -18,28 +18,51 @@ import {
 } from 'recharts';
 import './ChartPanel.css';
 
+const COLORS = {
+  LOW: '#22c55e',
+  MEDIUM: '#d46b08',
+  HIGH: '#b91c1c',
+  CRITICAL: '#5c0011',
+  PRIMARY: '#d71500',
+  GRAY: '#9CA3AF'
+};
+
 function ChartPanel({ chartData }) {
   const [activeChart, setActiveChart] = useState('bubble');
 
   const RISK_COLORS = {
-    Low: '#22c55e',
-    Medium: '#d46b08',
-    High: '#b91c1c',
-    Critical: '#5c0011'
+    Low: COLORS.LOW,
+    Medium: COLORS.MEDIUM,
+    High: COLORS.HIGH,
+    Critical: COLORS.CRITICAL
   };
 
+  // const SPECIALTY_COLORS = [
+  //   COLORS.CRITICAL,
+  //   COLORS.HIGH,
+  //   COLORS.HIGH,
+  //   COLORS.PRIMARY,
+  //   '#F97316',
+  //   '#FB8C00',
+  //   '#F59E0B',
+  //   '#FACC15',
+  //   '#E6E8EB',
+  //   COLORS.GRAY
+  // ];
+
   const SPECIALTY_COLORS = [
-    '#5C0011',
-    '#8B0000',
-    '#B91C1C',
-    '#D71500',
-    '#F97316',
-    '#FB8C00',
-    '#F59E0B',
-    '#FACC15',
-    '#E6E8EB',
-    '#9CA3AF'
+    '#9C27B0',   // Violet
+    '#9763f0',   // Indigo
+    '#0026ff',   // Blue
+    '#4CAF50',   // Green
+    '#FFEB3B',   // Yellow
+    '#FF9800',   // Orange
+    '#f45936',   // Red
+    '#ff0000',   // Pink
+    '#00BCD4',   // Cyan
+    '#ff00c8'    // Deep Purple
   ];
+
 
   const DONUT_CONFIG = {
     height: 330,
@@ -51,15 +74,15 @@ function ChartPanel({ chartData }) {
   };
 
   const getDonutColor = (name) => {
-    if (name === 'Low Risk') return '#22c55e';
-    if (name === 'Medium Risk') return '#d46b08';
-    if (name === 'High Risk') return '#b91c1c';
-    if (name === 'Critical') return '#5c0011';
+    if (name === 'Low Risk') return COLORS.LOW;
+    if (name === 'Medium Risk') return COLORS.MEDIUM;
+    if (name === 'High Risk') return COLORS.HIGH;
+    if (name === 'Critical') return COLORS.CRITICAL;
 
-    if (name === 'Risky Hospitals') return '#d71500';
+    if (name === 'Risky Hospitals') return COLORS.PRIMARY;
     if (name === 'Safe Hospitals') return '#E6E8EB';
 
-    return '#d71500';
+    return COLORS.PRIMARY;
   };
 
   const formatNumber = (value) => {
@@ -88,7 +111,7 @@ function ChartPanel({ chartData }) {
       return (
         <div className="chart-panel-tooltip">
           <p className="tooltip-title">{data.label}</p>
-          <p>DSO: <strong>{data.x}</strong></p>
+          <p>Payment Delay: <strong>{data.x}</strong></p>
           <p>Credit Used: <strong>{formatCurrency(data.y)}</strong></p>
           <p>Tier: <strong>{data.risk_tier || 'Unknown'}</strong></p>
           <p className="tooltip-muted">Bubble size = total payments</p>
@@ -126,8 +149,8 @@ function ChartPanel({ chartData }) {
         ...item,
         fill:
           item.risk === 1
-            ? RISK_COLORS[item.risk_tier] || '#d71500'
-            : '#22c55e'
+            ? RISK_COLORS[item.risk_tier] || COLORS.PRIMARY
+            : COLORS.LOW
       }));
 
       if (!coloredBubbleData.length) {
@@ -141,9 +164,9 @@ function ChartPanel({ chartData }) {
 
             <XAxis
               dataKey="x"
-              name="DSO 30d"
+              name="Payment Delay (30d)"
               type="number"
-              label={{ value: 'DSO 30d', position: 'insideBottom', offset: -5 }}
+              label={{ value: 'Payment Delay (30d)', position: 'insideBottom', offset: -5 }}
             />
 
             <YAxis
@@ -313,7 +336,7 @@ function ChartPanel({ chartData }) {
               yAxisId="left"
               dataKey="exposureBar"
               name="Exposure Scale"
-              fill="#5C0011"
+              fill={COLORS.CRITICAL}
               radius={[7, 7, 0, 0]}
             />
 
@@ -321,7 +344,7 @@ function ChartPanel({ chartData }) {
               yAxisId="left"
               dataKey="hospitalBar"
               name="Hospital Count Scale"
-              fill="#D71500"
+              fill={COLORS.PRIMARY}
               radius={[7, 7, 0, 0]}
             />
 

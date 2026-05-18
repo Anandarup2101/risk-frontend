@@ -76,13 +76,6 @@ const ChartIcon = ({ size = 18, color = 'currentColor' }) => (
   </svg>
 );
 
-const ConsensusIcon = ({ size = 18, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"></circle>
-    <path d="M8 12l2.5 2.5L16 9"></path>
-  </svg>
-);
-
 const GalleryIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="5" width="18" height="14" rx="2"></rect>
@@ -130,7 +123,7 @@ const CustomPdpTooltip = ({ active, payload }) => {
 };
 
 const PdpGalleryCard = ({ plot }) => {
-  if (!plot) return <div className="pdp-empty-state">No PDP chart available.</div>;
+  if (!plot) return <div className="pdp-empty-state">No analysis chart available.</div>;
 
   return (
     <div className="pdp-gallery-card">
@@ -186,7 +179,7 @@ const PdpGalleryCard = ({ plot }) => {
 
               <Scatter
                 data={plot.hospital_point ? [plot.hospital_point] : []}
-                fill="#b91c1c"
+                fill="var(--risk-high)"
                 shape="circle"
                 r={7}
                 z={10}
@@ -339,7 +332,6 @@ const HospitalDetails = () => {
 
   const hospital = data.hospital || {};
   const waterfall = data.waterfall || { features: [] };
-  const treeVote = data.tree_vote || { risk_percent: 0, yes_votes: 0, no_votes: 0 };
   const pdpPlots = Array.isArray(data.pdp_plots) ? data.pdp_plots : [];
   const activePdp = pdpPlots[activePdpIndex];
 
@@ -419,17 +411,12 @@ const HospitalDetails = () => {
         <div className="details-tabs">
           <button className={activeTab === 'feature' ? 'active' : ''} onClick={() => setActiveTab('feature')}>
             <ChartIcon />
-            Feature Contribution
-          </button>
-
-          <button className={activeTab === 'consensus' ? 'active' : ''} onClick={() => setActiveTab('consensus')}>
-            <ConsensusIcon />
-            Model Consensus
+            Key Risk Drivers
           </button>
 
           <button className={activeTab === 'pdp' ? 'active' : ''} onClick={() => setActiveTab('pdp')}>
             <GalleryIcon />
-            PDP Gallery
+            What-If Analysis
           </button>
         </div>
 
@@ -438,8 +425,8 @@ const HospitalDetails = () => {
             <div className="card tab-card">
               <div className="card-header card-header-with-toggle">
                 <div>
-                  <h3>Feature Contribution</h3>
-                  <p className="subtitle">Top factors increasing or decreasing risk score</p>
+                  <h3>Key Risk Drivers</h3>
+                  <p className="subtitle">Top factors increasing or decreasing the hospital's risk score</p>
                 </div>
 
                 <div className="chart-toggle">
@@ -478,7 +465,7 @@ const HospitalDetails = () => {
                 <div className="waterfall-explanation-panel">
                   {waterfallExplanationLoading ? (
                     <div className="inline-loading">
-                      <RefreshIcon size={24} className="spin" color="#d71500" />
+                      <RefreshIcon size={24} className="spin" color="var(--primary-red)" />
                       <span>Generating explanation...</span>
                     </div>
                   ) : waterfallExplanationError ? (
@@ -491,45 +478,12 @@ const HospitalDetails = () => {
             </div>
           )}
 
-          {activeTab === 'consensus' && (
-            <div className="card tab-card consensus-card">
-              <div className="card-header">
-                <h3>Model Consensus</h3>
-                <p className="subtitle">Risk signal breakdown from the random forest model</p>
-              </div>
-
-              <div className="vote-visual">
-                <div className="vote-percent">
-                  {Number(treeVote.risk_percent || 0)}%
-                  <span className="vote-sub">Risky</span>
-                </div>
-
-                <div className="vote-bar-container">
-                  <div className="vote-segment risky" style={{ width: `${Number(treeVote.risk_percent || 0)}%` }}></div>
-                  <div className="vote-segment safe" style={{ width: `${100 - Number(treeVote.risk_percent || 0)}%` }}></div>
-                </div>
-
-                <div className="vote-stats">
-                  <div className="stat-item">
-                    <span className="count">{Number(treeVote.yes_votes || 0)}</span>
-                    <span className="label">Warning Indicators<p>High Risk Signals</p></span>
-                  </div>
-
-                  <div className="stat-item">
-                    <span className="count">{Number(treeVote.no_votes || 0)}</span>
-                    <span className="label">Confidence in Stability<p>Low Risk Signals</p></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {activeTab === 'pdp' && (
             <div className="card tab-card pdp-tab-card">
               <div className="card-header pdp-gallery-top">
                 <div>
-                  <h3>PDP Gallery</h3>
-                  <p className="subtitle">Scroll through feature action curves one chart at a time</p>
+                  <h3>What-If Analysis</h3>
+                  <p className="subtitle">Explore how changing key metrics impacts the hospital's risk score</p>
                 </div>
 
                 <div className="gallery-counter">
@@ -545,7 +499,7 @@ const HospitalDetails = () => {
                     className="gallery-side-arrow"
                     onClick={goPrevPdp}
                     disabled={activePdpIndex === 0}
-                    aria-label="Previous PDP chart"
+                    aria-label="Previous chart"
                   >
                     <ChevronLeft />
                   </button>
@@ -558,7 +512,7 @@ const HospitalDetails = () => {
                     className="gallery-side-arrow"
                     onClick={() => goNextPdp(pdpPlots.length)}
                     disabled={activePdpIndex === pdpPlots.length - 1}
-                    aria-label="Next PDP chart"
+                    aria-label="Next chart"
                   >
                     <ChevronRight />
                   </button>

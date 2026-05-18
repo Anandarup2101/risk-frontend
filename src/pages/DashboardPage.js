@@ -11,16 +11,7 @@ import ChatbotAssistant from '../components/ChatbotAssistant';
 import './DashboardPage.css';
 
 const RiskAnalysisIcon = ({ size = 18, color = 'currentColor' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="6" y1="20" x2="6" y2="10"></line>
     <line x1="12" y1="20" x2="12" y2="4"></line>
     <line x1="18" y1="20" x2="18" y2="14"></line>
@@ -28,17 +19,7 @@ const RiskAnalysisIcon = ({ size = 18, color = 'currentColor' }) => (
 );
 
 const RefreshIcon = ({ size = 24, color = 'currentColor', className = '' }) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.25"></path>
   </svg>
 );
@@ -248,6 +229,11 @@ function DashboardPage() {
               </div>
 
               <KpiCards cards={data?.cards} />
+              
+              <div className="kpi-footnote">
+                * Total Exposure represents the outstanding Accounts Receivable (AR) value. 
+                % Exposure At Risk is the portion of that AR value belonging to Medium, High, and Critical risk hospitals.
+              </div>
 
               <div className="risk-table-page-wrapper">
                 <RiskTable tableData={data?.table} />
@@ -291,7 +277,7 @@ function DashboardPage() {
             <div className="overview-modal-body">
               {overviewLoading && (
                 <div className="overview-loading-container">
-                  <RefreshIcon size={32} className="dashboard-spin" color="#d71500" />
+                  <RefreshIcon size={32} className="dashboard-spin" color="var(--primary-red)" />
                   <span className="overview-loading-text">
                     Generating business interpretation...
                   </span>
